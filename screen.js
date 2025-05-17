@@ -8,8 +8,8 @@ function drawBlock(color, position, size, camera){
     //Translating coordinate system so that y is up and zero is at the bottom.
     const cameraRelX = position.x - camera.position.x;
     const cameraRelY = position.y - camera.position.y;
-    const screenX = scale * cameraRelX;
-    const screenY = camera.canvas.height - scale * cameraRelY;
+    const screenX = (camera.canvas.width/2) + scale * cameraRelX;
+    const screenY = (camera.canvas.height/2) - scale * cameraRelY;
     const screenWidth = scale * size.x;
     const screenHeight = scale * size.y;
 
@@ -21,8 +21,8 @@ function getCamera(){
     const canvas = document.getElementById("screen");
     const context = canvas.getContext("2d");
     return {
-        position: {x: 0, y: 0},
-        viewSize: 5,
+        position: {x: 0, y: 2},
+        viewSize: 10,
         canvas: canvas,
         context: context
     };

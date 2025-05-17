@@ -1,0 +1,66 @@
+const BlockFun = {
+    read: function (block) {
+        if (!Object.hasOwn(block, "graphics")) {
+            block.graphics = {color: "green"};
+        }
+        if (!Object.hasOwn(block, "size")) {
+            block.size = {x: 1, y: 1};
+        }
+        return block;
+    },
+    draw: function (block, camera) {
+        drawBlock(block.graphics.color, block.position, block.size, camera);
+    },
+    intersects: function(blockA, blockB) {
+        let posDif = {x: (blockA.position.x - blockB.position.x), y: (blockA.position.y - blockB.position.y)};
+        let avgSize = {x: (blockA.size.x + blockB.size.x)/2, y: (blockA.size.y + blockB.size.y)/2};
+        return Math.abs(posDif.x) < avgSize.x && Math.abs(posDif.y) < avgSize.y;
+    },
+    strictlyAbove: function (thisBlock, thatBlock) {
+        return thisBlock.position.y > thatBlock.position.y + (thisBlock.size.y + thatBlock.size.y)/2;
+    },
+    strictlyBelow: function (thisBlock, thatBlock) {
+        return BlockFun.strictlyAbove(thatBlock, thisBlock);
+    },
+    strictlyToTheRight: function (thisBlock, thatBlock) {
+        return thisBlock.position.x > thatBlock.position.x + (thisBlock.size.x + thatBlock.size.x)/2;
+    },
+    strictlyToTheLeft: function (thisBlock, thatBlock) {
+        return BlockFun.strictlyToTheRight(thatBlock, thisBlock);
+    },
+};
+
+const MapFun = {
+    read: function (json) {
+        const map = JSON.parse(json);
+        for (let block of map) {
+            BlockFun.read(block);
+        }
+        return map;
+    },
+    draw: function (map, camera) {
+        for (let block of map) {
+            BlockFun.draw(block, camera);
+        }
+    }
+};
+
+const mapData = `[
+    {
+        "position": {"x": 0, "y": -1},
+        "size": {"x": 8, "y": 2}
+    },
+    {
+        "position": {"x": 3, "y": 2},
+        "size": {"x": 1, "y": 1}
+    },
+    {
+        "position": {"x": 0, "y": 3},
+        "size": {"x": 1, "y": 2}
+    }
+    ]`;
+
+
+function getDefaultMapData() {
+    return MapFun.read(mapData);
+}

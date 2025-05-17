@@ -24,9 +24,14 @@ function getPlayer() {
             x: 0,
             y: 0
         },
+        status: {
+            curJumps: 0,
+        },
         stats: {
             jumpHeight: 20, //Leafs tall and seconds
-            runSpeed: 5
+            runSpeed: 5,
+            fallDrag: 1,
+            maxDoubleJump: 3
         }
     };
 }
@@ -39,16 +44,22 @@ function updatePlayer(player, worldData){
         player.position.x+= player.stats.runSpeed * worldData.time.deltaTime;
     }
     if(keyDownSet.has('w')){
-        player.velocity.y = player.stats.jumpHeight;
-
-        player.position.y += 0.00001;
+        if (player.status.curJumps < player.stats.maxDoubleJump) {
+            player.velocity.y = player.stats.jumpHeight;
+            player.position.y += 0.00001;
+            player.status.curJumps++;
+        }
     }
     if(isOnGround(player)){
         player.position.y = player.size.y/2;
         player.velocity.y = 0;
+        player.status.curJumps = 0;
     }
     else {
-        player.velocity.y+= worldData.gravity * worldData.time.deltaTime;;
+        player.velocity.y+= worldData.gravity * worldData.time.deltaTime;
+        if (player.velocity.y < 0) {
+            player.velocity.y *= Math.exp(player.velocity.y * player.stats.fallDrag * worldData.time.deltaTime);
+        }
         player.position.y+= player.velocity.y * worldData.time.deltaTime;
     }
     keyDownSet.clear();

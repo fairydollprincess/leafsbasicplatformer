@@ -5,6 +5,7 @@ var worldData = {
         currentTime: new Date(),
         deltaTime: 0,
     },
+    map: getDefaultMapData(),
     camera: getCamera()
 };
 
@@ -19,6 +20,7 @@ function update(){
     updateTime(worldData.time);
     updatePlayer(worldData.player, worldData)
     drawBackground(worldData.camera);
+    MapFun.draw(worldData.map, worldData.camera);
     drawPlayer(worldData.player, worldData.camera)
     requestAnimationFrame(update);
 }
