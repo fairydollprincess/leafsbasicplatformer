@@ -1,5 +1,8 @@
 const BlockFun = {
-    read: function (block) {
+    build: function (x=0, y=0, w=1, h=1) {
+        return BlockFun.finish({position: {x: x, y: y}, size: {x: w, y: h}});
+    },
+    finish: function (block) {
         if (!Object.hasOwn(block, "graphics")) {
             block.graphics = {color: "green"};
         }
@@ -17,16 +20,16 @@ const BlockFun = {
         return Math.abs(posDif.x) < avgSize.x && Math.abs(posDif.y) < avgSize.y;
     },
     strictlyAbove: function (thisBlock, thatBlock) {
-        return thisBlock.position.y > thatBlock.position.y + (thisBlock.size.y + thatBlock.size.y)/2;
+        return thisBlock.position.y >= thatBlock.position.y + (thisBlock.size.y + thatBlock.size.y)/2;
     },
     strictlyBelow: function (thisBlock, thatBlock) {
-        return BlockFun.strictlyAbove(thatBlock, thisBlock);
+        return thisBlock.position.y <= thatBlock.position.y - (thisBlock.size.y + thatBlock.size.y)/2;
     },
     strictlyToTheRight: function (thisBlock, thatBlock) {
-        return thisBlock.position.x > thatBlock.position.x + (thisBlock.size.x + thatBlock.size.x)/2;
+        return thisBlock.position.x >= thatBlock.position.x + (thisBlock.size.x + thatBlock.size.x)/2;
     },
     strictlyToTheLeft: function (thisBlock, thatBlock) {
-        return BlockFun.strictlyToTheRight(thatBlock, thisBlock);
+        return thisBlock.position.x <= thatBlock.position.x - (thisBlock.size.x + thatBlock.size.x)/2;
     },
 };
 
@@ -34,7 +37,7 @@ const MapFun = {
     read: function (json) {
         const map = JSON.parse(json);
         for (let block of map) {
-            BlockFun.read(block);
+            BlockFun.finish(block);
         }
         return map;
     },
@@ -57,6 +60,10 @@ const mapData = `[
     {
         "position": {"x": 0, "y": 3},
         "size": {"x": 1, "y": 2}
+    },
+    {
+        "position": {"x": -3, "y": 0.5},
+        "graphics": {"color": "brown"}
     }
     ]`;
 
