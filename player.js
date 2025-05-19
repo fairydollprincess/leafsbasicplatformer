@@ -30,10 +30,57 @@ function getPlayer() {
         stats: {
             jumpHeight: 20, //Leafs tall and seconds
             runSpeed: 5,
-            fallDrag: 1,
+            fallDrag: 10,
             maxDoubleJump: 3
         }
     };
+}
+
+/**
+ * Applies kinematic equations to get the new positions and velocities after deltaTime passes. It does not change
+ * the variables passed in, but returns a new state.
+ *
+ * We evolve the system according to the equation: acceleration = force - drag * initialState.velocity.
+ * This equation has a closed form solution of:
+ * velocity = (initialState.velocity - force/drag)*e^(-drag * deltaTime) + force/drag
+ * position = initialState.position - initialState.velocity/drag + force/drag^2 + force * deltaTime /drag - (initialState.velocity - force/drag)*e^(-drag * deltaTime)  / drag
+ *
+ * @param initialState an object containing a position and a velocity
+ * @param force an object describing how the object is accelerating
+ * @param deltaTime how much time to move the object subject to these parameters
+ * @param drag how much drag to apply to the object.
+ */
+function stateAfterKinematics(initialState, force = {x:0,y:0}, deltaTime = 0, drag ={x:0.000001,y:0.000001}) {
+    if (typeof drag === "number") {
+        drag = {x: drag, y: drag};
+    }
+
+    let newState = {position: {x:0,y:0}, velocity:{x:0,y:0}};
+    //New Equation
+    let targetVelocity = {
+        x: force.x / drag.x,
+        y: force.y / drag.y
+    }
+    let residualVelocity = {
+        x: (initialState.velocity.x - targetVelocity.x) * Math.exp(-drag.x * deltaTime),
+        y: (initialState.velocity.y - targetVelocity.y) * Math.exp(-drag.y * deltaTime)
+    };
+    newState.velocity = {
+        x: residualVelocity.x + targetVelocity.x,
+        y: residualVelocity.y + targetVelocity.y
+    };
+    newState.position = {
+        x: initialState.position.x + targetVelocity.x * deltaTime -
+            (residualVelocity.x - initialState.velocity.x + targetVelocity.x) / drag.x,
+        y: initialState.position.y + targetVelocity.y * deltaTime -
+            (residualVelocity.y - initialState.velocity.y + targetVelocity.y) / drag.y
+    };
+    return newState;
+}
+
+function updatePlayerPositionAndVelocity(player, newState) {
+    player.position = newState.position;
+    player.velocity = newState.velocity;
 }
 
 function updatePlayer(player, worldData){
@@ -56,11 +103,13 @@ function updatePlayer(player, worldData){
         player.status.curJumps = 0;
     }
     else {
-        player.velocity.y+= worldData.gravity * worldData.time.deltaTime;
+        let newState;
         if (player.velocity.y < 0) {
-            player.velocity.y *= Math.exp(player.velocity.y * player.stats.fallDrag * worldData.time.deltaTime);
+            newState = stateAfterKinematics(player, {x:0,y:worldData.gravity}, worldData.time.deltaTime, player.stats.fallDrag);
+        } else {
+            newState = stateAfterKinematics(player, {x:0,y:worldData.gravity}, worldData.time.deltaTime);
         }
-        player.position.y+= player.velocity.y * worldData.time.deltaTime;
+        updatePlayerPositionAndVelocity(player, newState);
     }
     keyDownSet.clear();
 }

@@ -21,7 +21,7 @@ function update(){
     updatePlayer(worldData.player, worldData)
     drawBackground(worldData.camera);
     MapFun.draw(worldData.map, worldData.camera);
-    drawPlayer(worldData.player, worldData.camera)
+    drawPlayer(worldData.player, worldData.camera);
     requestAnimationFrame(update);
 }
 updateTime(worldData.time);
