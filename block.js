@@ -14,6 +14,13 @@ const BlockFun = {
     draw: function (block, camera) {
         drawBlock(block.graphics.color, block.position, block.size, camera);
     },
+    /**
+     * Returns whether blockA intersects blockB, i.e. whether there is a point in both blocks.
+     * This excludes edges, so two blocks that share an edge DO NOT intersect.
+     * @param blockA
+     * @param blockB
+     * @returns {boolean}
+     */
     intersects: function(blockA, blockB) {
         let posDif = {x: (blockA.position.x - blockB.position.x), y: (blockA.position.y - blockB.position.y)};
         let avgSize = {x: (blockA.size.x + blockB.size.x)/2, y: (blockA.size.y + blockB.size.y)/2};
@@ -31,6 +38,12 @@ const BlockFun = {
     strictlyToTheLeft: function (thisBlock, thatBlock) {
         return thisBlock.position.x <= thatBlock.position.x - (thisBlock.size.x + thatBlock.size.x)/2;
     },
+    // check bottom of player touches block
+    onBlock: function (thisBlock, thatBlock){
+        let posDif = {x: (thisBlock.position.x - thatBlock.position.x), y: (thisBlock.position.y - thatBlock.position.y)};
+        let avgSize = {x: (thisBlock.size.x + thatBlock.size.x)/2, y: (thisBlock.size.y + thatBlock.size.y)/2};
+        return Math.abs(posDif.x) < avgSize.x && Math.abs(posDif.y - avgSize.y) < 0.000000001;
+    }
 };
 
 const MapFun = {
