@@ -1,13 +1,5 @@
 
-var keySet = new Set();
-var keyDownSet = new Set();
-document.addEventListener("keydown", (event) => {
-    keySet.add(event.key.toLowerCase());
-    keyDownSet.add(event.key.toLowerCase())
-});
-document.addEventListener("keyup", (event) => {
-    keySet.delete(event.key.toLowerCase());
-});
+
 
 
 function getPlayer() {
@@ -29,10 +21,14 @@ function getPlayer() {
         },
         stats: {
             jumpHeight: 20, //Leafs tall and seconds
-            runSpeed: 5,
-            fallDrag: 10,
+            airForce: 7,
+            fallDrag: {x:0.8,y: 20},
+            groundForce: 70,
+            groundStopSpeed: 0.1,
+            groundDrag: 10,
             maxDoubleJump: 3
-        }
+        },
+       input: getDefaultInput()
     };
 }
 
@@ -84,34 +80,36 @@ function updatePlayerPositionAndVelocity(player, newState) {
 }
 
 function updatePlayer(player, worldData){
-    if(keySet.has('a')){
-        player.position.x-= player.stats.runSpeed * worldData.time.deltaTime;
-    }
-    if(keySet.has('d')){
-        player.position.x+= player.stats.runSpeed * worldData.time.deltaTime;
-    }
-    if(keyDownSet.has('w')){
+    if(player.input.pressJump()){
         if (player.status.curJumps < player.stats.maxDoubleJump) {
             player.velocity.y = player.stats.jumpHeight;
             player.position.y += 0.00001;
             player.status.curJumps++;
         }
     }
+    let xMoveDirection = player.input.getHorizontal();
     if(isOnGround(player)){
-        player.position.y = player.size.y/2;
-        player.velocity.y = 0;
+        let force = {x: xMoveDirection*player.stats.groundForce, y: 0};
+        let newPosition = stateAfterKinematics(player, force, worldData.time.deltaTime, player.stats.groundDrag);
+        newPosition.velocity.y = 0;
+        newPosition.position.y = player.size.y/2;
+        if (force.x === 0 && Math.abs(newPosition.velocity.x) < player.stats.groundStopSpeed) {
+            newPosition.velocity.x = 0;
+        }
+        updatePlayerPositionAndVelocity(player, newPosition);
         player.status.curJumps = 0;
     }
     else {
         let newState;
+        let force = {x: xMoveDirection*player.stats.airForce, y: worldData.gravity};
         if (player.velocity.y < 0) {
-            newState = stateAfterKinematics(player, {x:0,y:worldData.gravity}, worldData.time.deltaTime, player.stats.fallDrag);
+            newState = stateAfterKinematics(player, force, worldData.time.deltaTime, player.stats.fallDrag);
         } else {
-            newState = stateAfterKinematics(player, {x:0,y:worldData.gravity}, worldData.time.deltaTime);
+            newState = stateAfterKinematics(player, force, worldData.time.deltaTime);
         }
         updatePlayerPositionAndVelocity(player, newState);
     }
-    keyDownSet.clear();
+    player.input.endFrame();
 }
 function isOnGround(character){
     const bottom = character.position.y - character.size.y/2;
