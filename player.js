@@ -1,7 +1,4 @@
 
-
-
-
 function getPlayer() {
    return {
         position: {
@@ -91,6 +88,11 @@ function groundUpdate(player, worldData) {
         newState.velocity.x = 0;
     }
     player.status.curJumps = 0;
+
+    if(player.input.pressJump()){
+        newState.velocity.y = player.stats.jumpHeight;
+        newState.position.y += 0.00001;
+    }
     return newState;
 }
 
@@ -101,38 +103,39 @@ function stateFromState(player, worldData, state) {
 }
 
 function airUpdate(player, worldData) {
+    let newState = {};
     if (player.velocity.y < 0) {
         if (player.input.getVertical() < 0) {
-            return stateFromState(player, worldData, player.stats.fall.down);
+            newState= stateFromState(player, worldData, player.stats.fall.down);
         } else {
-            return stateFromState(player, worldData, player.stats.fall.neutral);
+            newState= stateFromState(player, worldData, player.stats.fall.neutral);
         }
     } else {
         if (player.input.getVertical() < 0) {
-            return stateFromState(player, worldData, player.stats.rise.down);
+            newState= stateFromState(player, worldData, player.stats.rise.down);
         } else {
-            return stateFromState(player, worldData, player.stats.rise.neutral);
+            newState= stateFromState(player, worldData, player.stats.rise.neutral);
         }
     }
-}
 
-function updatePlayer(player, worldData){
     if(player.input.pressJump()){
         if (player.status.curJumps < player.stats.maxDoubleJump) {
-            player.velocity.y = player.stats.jumpHeight;
-            player.position.y += 0.00001;
+            newState.velocity.y = player.stats.jumpHeight;
             player.status.curJumps++;
         }
     }
+    return newState;
+}
 
+function updatePlayer(player, worldData){
     let newState;
-    if(isOnGround(player, worldData.map)){
+    if(isOnGround(player, worldData.map.blocks)){
         newState = groundUpdate(player, worldData);
     }
     else {
         newState = airUpdate(player, worldData);
     }
-    interactWithBlock(player, newState, worldData.map);
+    interactWithBlock(player, newState, worldData.map.blocks);
     updatePlayerPositionAndVelocity(player, newState);
     player.input.endFrame();
 }

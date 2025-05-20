@@ -131,7 +131,12 @@ QUnit.module('BlockFun', function() {
 
 QUnit.module('MapFun', function() {
     QUnit.test('read', function(assert) {
-        const mapData = `[
+        const mapData = `{
+        "worldData": {
+            "spawnPoint": {"x": 0, "y": 0},
+            "bounds": {"position": {"x": 0, "y": 0}, "size": {"x": 200, "y": 200}}
+        },
+        "blocks": [
             {
                 "position": {"x": 0, "y": -1},
                 "size": {"x": 8, "y": 2}
@@ -148,8 +153,13 @@ QUnit.module('MapFun', function() {
                 "position": {"x": -3, "y": 0.5},
                 "graphics": {"color": "brown"}
             }
-            ]`;
-        const expectedOutput = [
+            ]}`;
+        const expectedOutput = {
+            worldData: {
+                spawnPoint: {x: 0, y: 0},
+                bounds: {position: {x: 0, y: 0}, size: {x: 200, y: 200}}
+            },
+            blocks: [
             {
                 position: {x: 0, y: -1},
                 size: {x: 8, y: 2},
@@ -169,7 +179,7 @@ QUnit.module('MapFun', function() {
                 position: {x: -3, y: 0.5},
                 size: {x: 1, y: 1},
                 graphics: {color: "brown"}
-            }]
+            }]};
         assert.deepEqual(MapFun.read(mapData), expectedOutput);
     });
 });

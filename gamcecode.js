@@ -19,7 +19,7 @@ function updateTime(worldTime) {
 function update(){
     updateTime(worldData.time);
     updatePlayer(worldData.player, worldData)
-    drawBackground(worldData.camera);
+    drawBackground(worldData.camera, worldData.map.graphics.color);
     MapFun.draw(worldData.map, worldData.camera);
     drawPlayer(worldData.player, worldData.camera);
     requestAnimationFrame(update);

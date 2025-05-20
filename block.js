@@ -49,19 +49,34 @@ const BlockFun = {
 const MapFun = {
     read: function (json) {
         const map = JSON.parse(json);
-        for (let block of map) {
+        for (let block of map.blocks) {
             BlockFun.finish(block);
         }
         return map;
     },
+    write: function (map) {
+        return JSON.stringify(map);
+    },
     draw: function (map, camera) {
-        for (let block of map) {
+        for (let block of map.blocks) {
             BlockFun.draw(block, camera);
         }
     }
 };
 
-const mapData = `[
+const mapData = `{
+"worldData": {
+    "spawnPoint": {"x": 0, "y": 0},
+    "bounds": {"position": {"x": 0, "y": 0}, "size": {"x": 200, "y": 200}}
+},
+"graphics": {
+    "name": "Test",
+    "viewSize": 30,
+    "viewCenter": {"x": 0, "y": 0},
+    "color": "purple"
+},
+"blocks": 
+[
     {
         "position": {"x": 0, "y": -1},
         "size": {"x": 25, "y": 2}
@@ -111,7 +126,8 @@ const mapData = `[
         "position": {"x": 15, "y": 5},
         "graphics": {"color": "white"}
     }
-    ]`;
+    ]
+    }`;
 
 
 function getDefaultMapData() {
