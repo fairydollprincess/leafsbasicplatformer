@@ -64,7 +64,32 @@ const MapFun = {
 const mapData = `[
     {
         "position": {"x": 0, "y": -1},
-        "size": {"x": 8, "y": 2}
+        "size": {"x": 25, "y": 2}
+    },
+    {
+        "position": {"x": 0, "y": -5},
+        "size": {"x": 5, "y": 1},
+        "graphics": {"color": "cyan"}
+    },
+    {
+        "position": {"x": 15, "y": -5},
+        "size": {"x": 5, "y": 1},
+        "graphics": {"color": "cyan"}
+    },
+    {
+        "position": {"x": 25, "y": -5},
+        "size": {"x": 5, "y": 1},
+        "graphics": {"color": "cyan"}
+    },
+    {
+        "position": {"x": -15, "y": -5},
+        "size": {"x": 5, "y": 1},
+        "graphics": {"color": "cyan"}
+    },
+    {
+        "position": {"x": -25, "y": -5},
+        "size": {"x": 5, "y": 1},
+        "graphics": {"color": "cyan"}
     },
     {
         "position": {"x": 3, "y": 2},
@@ -77,6 +102,14 @@ const mapData = `[
     {
         "position": {"x": -3, "y": 0.5},
         "graphics": {"color": "brown"}
+    },
+    {
+        "position": {"x": -15, "y": 5},
+        "graphics": {"color": "white"}
+    },
+    {
+        "position": {"x": 15, "y": 5},
+        "graphics": {"color": "white"}
     }
     ]`;
 

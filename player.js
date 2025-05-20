@@ -21,11 +21,13 @@ function getPlayer() {
         },
         stats: {
             jumpHeight: 20, //Leafs tall and seconds
-            airForce: 7,
-            fallDrag: {x:0.8,y: 20},
-            groundForce: 70,
-            groundStopSpeed: 0.1,
-            groundDrag: 10,
+            rise: {
+                neutral: {force: 7, drag: {x: 0.01, y: 0.01}},
+                down: {force: 20, drag: {x: 0.1, y: 30}}
+            },
+            fall: {neutral: {force: 7, drag: {x:0.8,y: 20}},
+                    down: {force: 50, drag: {x:4, y: 8}}},
+            ground: {force: 70, drag: 10, stopSpeed: 0.1},
             maxDoubleJump: 3
         },
        input: getDefaultInput()
@@ -79,6 +81,41 @@ function updatePlayerPositionAndVelocity(player, newState) {
     player.velocity = newState.velocity;
 }
 
+
+function groundUpdate(player, worldData) {
+    let xMoveDirection = player.input.getHorizontal();
+    let force = {x: xMoveDirection*player.stats.ground.force, y: 0};
+    let newState = stateAfterKinematics(player, force, worldData.time.deltaTime, player.stats.ground.drag);
+    newState.velocity.y = 0;
+    if (force.x === 0 && Math.abs(newState.velocity.x) < player.stats.ground.stopSpeed) {
+        newState.velocity.x = 0;
+    }
+    player.status.curJumps = 0;
+    return newState;
+}
+
+function stateFromState(player, worldData, state) {
+    let xMoveDirection = player.input.getHorizontal();
+    let force = {x: xMoveDirection*state.force, y: worldData.gravity};
+    return stateAfterKinematics(player, force, worldData.time.deltaTime, state.drag);
+}
+
+function airUpdate(player, worldData) {
+    if (player.velocity.y < 0) {
+        if (player.input.getVertical() < 0) {
+            return stateFromState(player, worldData, player.stats.fall.down);
+        } else {
+            return stateFromState(player, worldData, player.stats.fall.neutral);
+        }
+    } else {
+        if (player.input.getVertical() < 0) {
+            return stateFromState(player, worldData, player.stats.rise.down);
+        } else {
+            return stateFromState(player, worldData, player.stats.rise.neutral);
+        }
+    }
+}
+
 function updatePlayer(player, worldData){
     if(player.input.pressJump()){
         if (player.status.curJumps < player.stats.maxDoubleJump) {
@@ -87,25 +124,13 @@ function updatePlayer(player, worldData){
             player.status.curJumps++;
         }
     }
-    let xMoveDirection = player.input.getHorizontal();
 
     let newState;
     if(isOnGround(player, worldData.map)){
-        let force = {x: xMoveDirection*player.stats.groundForce, y: 0};
-        newState = stateAfterKinematics(player, force, worldData.time.deltaTime, player.stats.groundDrag);
-        newState.velocity.y = 0;
-        if (force.x === 0 && Math.abs(newState.velocity.x) < player.stats.groundStopSpeed) {
-            newState.velocity.x = 0;
-        }
-        player.status.curJumps = 0;
+        newState = groundUpdate(player, worldData);
     }
     else {
-        let force = {x: xMoveDirection*player.stats.airForce, y: worldData.gravity};
-        if (player.velocity.y < 0) {
-            newState = stateAfterKinematics(player, force, worldData.time.deltaTime, player.stats.fallDrag);
-        } else {
-            newState = stateAfterKinematics(player, force, worldData.time.deltaTime);
-        }
+        newState = airUpdate(player, worldData);
     }
     interactWithBlock(player, newState, worldData.map);
     updatePlayerPositionAndVelocity(player, newState);

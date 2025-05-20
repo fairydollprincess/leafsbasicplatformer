@@ -22,7 +22,7 @@ function getCamera(){
     const context = canvas.getContext("2d");
     return {
         position: {x: 0, y: 2},
-        viewSize: 10,
+        viewSize: 30,
         canvas: canvas,
         context: context
     };
