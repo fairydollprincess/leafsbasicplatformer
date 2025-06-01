@@ -137,6 +137,8 @@ function updatePlayer(player, worldData){
     }
     interactWithBlock(player, newState, worldData.map.blocks);
     updatePlayerPositionAndVelocity(player, newState);
+    resetIfOutofBounds(player, worldData);
+
     player.input.endFrame();
 }
 // checks if player is on the ground or a block
@@ -147,6 +149,14 @@ function isOnGround(player, allBlocks){
         }
     }
     return false;
+}
+
+// checks if player is out of bounds and resets player
+function resetIfOutofBounds(player, worldData){
+    if (!BlockFun.intersects(player, worldData.map.spawnData.bounds)){
+        player.position = worldData.map.spawnData.spawnPoint;
+        player.velocity = {x: 0, y: 0};
+    }
 }
 
 function drawPlayer(player, camera){

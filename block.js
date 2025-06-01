@@ -65,9 +65,9 @@ const MapFun = {
 };
 
 const mapData = `{
-"worldData": {
+"spawnData": {
     "spawnPoint": {"x": 0, "y": 0},
-    "bounds": {"position": {"x": 0, "y": 0}, "size": {"x": 200, "y": 200}}
+    "bounds": {"position": {"x": 0, "y": 0}, "size": {"x": 60, "y": 30}}
 },
 "graphics": {
     "name": "Test",
