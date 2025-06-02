@@ -31,6 +31,7 @@ const ADD_MODE = "adding";
 const BUILDING_BLOCK_STATE = "building";
 const EDIITING_BLOCK_STATE = "editing";
 const DELETE_MODE = "deleting";
+const MAKE_SPAWN_POINT = "spawnPoint";
 
 var editorState = {
     mode: ADD_MODE,
@@ -108,6 +109,8 @@ document.getElementById("screen").addEventListener("click", (event) => {
         worldData.map.blocks.push(editorState.block);
     } else if (editorState.mode === DELETE_MODE) {
         deleteBlockAtPosition(event);
+    } else if (editorState.mode === MAKE_SPAWN_POINT){
+        worldData.map.spawnData.spawnPoint = clickPosition;
     }
 });
 
@@ -130,6 +133,7 @@ function drawLevel(){
     updatePlayer(worldData.player, worldData)
     drawBackground(worldData.camera, worldData.map.graphics.color);
     MapFun.draw(worldData.map, worldData.camera);
+    drawSpawnPoint(worldData.map.spawnData.spawnPoint, worldData.camera);
     drawPlayer(worldData.player, worldData.camera);
 
     if (editorState.mode === BUILDING_BLOCK_STATE) {
@@ -138,6 +142,10 @@ function drawLevel(){
     requestAnimationFrame(drawLevel);
 }
 
+// draws spawn point
+function drawSpawnPoint(spawnPoint, camera){
+    drawBlock("black", spawnPoint, {x: 1, y: 1}, camera)
+}
 readMapFromHTMLTextField();
 drawLevel();
 
