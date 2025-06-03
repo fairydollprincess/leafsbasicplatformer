@@ -1,28 +1,32 @@
-var worldData = {
-    gravity: -100,
-    player: getPlayer(),
-    time: {
-        currentTime: new Date(),
-        deltaTime: 0,
-    },
-    map: getDefaultMapData(),
-    camera: getCamera()
-};
+var currentGameInPlay = startGame(getDefaultMapData(), getPlayer());
 
+const MENU_STATE_IN_GAME = "inGame";
+const MENU_STATE_PAUSED = "paused";
 
-function updateTime(worldTime) {
-    const newTime = new Date();
-    worldTime.deltaTime = (newTime.getTime() - worldTime.currentTime.getTime()) /1000;
-    worldTime.currentTime = newTime;
+var menuState = {
+    controller: getDefaultInput(),
+    state: MENU_STATE_IN_GAME
 }
+
 
 function update(){
-    updateTime(worldData.time);
-    updatePlayer(worldData.player, worldData)
-    drawBackground(worldData.camera, worldData.map.graphics.color);
-    MapFun.draw(worldData.map, worldData.camera);
-    drawPlayer(worldData.player, worldData.camera);
+    if (menuState.state === MENU_STATE_IN_GAME) {
+        if (menuState.controller.pressPause()) {
+            menuState.state = MENU_STATE_PAUSED;
+            pauseGame(currentGameInPlay);
+        } else {
+            gameFullUpdate(currentGameInPlay);
+        }
+    } else if (menuState.state === MENU_STATE_PAUSED) {
+        if (menuState.controller.pressPause()) {
+            menuState.state = MENU_STATE_IN_GAME;
+            unPauseGame(currentGameInPlay);
+        } else {
+            gameRender(currentGameInPlay);
+            camUtil.drawText(currentGameInPlay.camera, "PAUSED", vec2.new(0, 0.5));
+        }
+    }
+    menuState.controller.endFrame();
     requestAnimationFrame(update);
 }
-updateTime(worldData.time);
 update();

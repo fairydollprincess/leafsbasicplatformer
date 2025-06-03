@@ -1,13 +1,4 @@
-var worldData = {
-    gravity: -100,
-    time: {
-        currentTime: new Date(),
-        deltaTime: 0,
-    },
-    player: getPlayer(),
-    map: getDefaultMapData(),
-    camera: getCamera()
-};
+var worldData = startGame(getDefaultMapData(), getPlayer());
 
 function changeMap(mapText) {
     worldData.map = MapFun.read(mapText);
@@ -122,20 +113,10 @@ document.getElementById("screen").addEventListener("mousemove", (event) => {
     }
 });
 
-function updateTime(worldTime) {
-    const newTime = new Date();
-    worldTime.deltaTime = (newTime.getTime() - worldTime.currentTime.getTime()) /1000;
-    worldTime.currentTime = newTime;
-}
-
 function drawLevel(){
-    updateTime(worldData.time);
-    updatePlayer(worldData.player, worldData)
-    drawBackground(worldData.camera, worldData.map.graphics.color);
-    MapFun.draw(worldData.map, worldData.camera);
-    drawSpawnPoint(worldData.map.spawnData.spawnPoint, worldData.camera);
-    drawPlayer(worldData.player, worldData.camera);
+    gameFullUpdate(worldData);
 
+    drawSpawnPoint(worldData.map.spawnData.spawnPoint, worldData.camera);
     if (editorState.mode === BUILDING_BLOCK_STATE) {
         BlockFun.draw(editorState.block, worldData.camera);
     }

@@ -17,7 +17,7 @@ function getDefaultInput() {
             keyUpSet: keyUpSet,
         },
         pressJump: function() {
-            return keyDownSet.has("w");
+            return keyDownSet.has("w") || keyDownSet.has(" ");
         },
         getHorizontal: function() {
             let val = 0;
@@ -38,6 +38,9 @@ function getDefaultInput() {
                 val--;
             }
             return val;
+        },
+        pressPause: function() {
+            return keyDownSet.has("p");
         },
         endFrame: function() {
             keyUpSet.clear();

@@ -19,6 +19,22 @@ const camUtil = {
         const halfViewSize = camUtil.getHalfViewSize(camera);
         return vec2.new(halfViewSize.x + scale * camRelPos.x,
             halfViewSize.y - scale * camRelPos.y);
+    },
+    //Writes the text to the screen. Writes it with 0, 0 in the middle, and 1,1 the top right.
+    drawText: function(camera, text, location=vec2.zero(), color="Grey", font="50px Arial") {
+        //Flips the y and makes the bottom left the origin.
+        const originFixed = vec2.new(1 + location.x, 1 - location.y);
+        const halfViewSize = camUtil.getHalfViewSize(camera);
+        const canvasSpaceLocation = vec2.mul( originFixed, halfViewSize );
+
+        camera.context.fillStyle = color;
+        camera.context.font = font;
+        const textSizeInfo = camera.context.measureText(text);
+        const textSize = vec2.new(textSizeInfo.width, -textSizeInfo.fontBoundingBoxAscent);
+
+        const topLeft = vec2.sub(canvasSpaceLocation, vec2.scalarMul(textSize, 0.5));
+
+        camera.context.fillText(text,topLeft.x,topLeft.y);
     }
 }
 
