@@ -62,7 +62,7 @@ function roundToGridPrecision(num) {
 
 function eventToFullPrecisionWorldPosition(event) {
     const htmlPosition = {x: event.offsetX, y: event.offsetY};
-    return screenPosToWorldPos(htmlPosition, worldData.camera);
+    return camUtil.screenPosToWorldPos(htmlPosition, worldData.camera);
 }
 
 function eventToWorldPosition(event) {
@@ -144,7 +144,7 @@ function drawLevel(){
 
 // draws spawn point
 function drawSpawnPoint(spawnPoint, camera){
-    drawBlock("black", spawnPoint, {x: 1, y: 1}, camera)
+    drawRing(spawnPoint, 0.5, camera, "black", "white", 0.2);
 }
 readMapFromHTMLTextField();
 drawLevel();

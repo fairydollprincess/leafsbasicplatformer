@@ -1,29 +1,20 @@
 
 function getPlayer() {
    return {
-        position: {
-            x: 0,
-            y: 0
-        },
-        size: {
-            x: 0.5,
-            y: 1
-        },
-        velocity: {
-            x: 0,
-            y: 0
-        },
+        position: vec2.zero(),
+        size: vec2.new(0.5, 1),
+        velocity: vec2.zero(),
         status: {
             curJumps: 0,
         },
         stats: {
             jumpHeight: 20, //Leafs tall and seconds
             rise: {
-                neutral: {force: 7, drag: {x: 0.01, y: 0.01}},
-                down: {force: 20, drag: {x: 0.1, y: 30}}
+                neutral: {force: 7, drag: vec2.new(0.01, 0.01)},
+                down: {force: 20, drag: vec2.new(0.1, 30)}
             },
-            fall: {neutral: {force: 7, drag: {x:0.8,y: 20}},
-                    down: {force: 50, drag: {x:4, y: 8}}},
+            fall: {neutral: {force: 7, drag: vec2.new(0.8, 20)},
+                    down: {force: 50, drag: vec2.new(4, 8)}},
             ground: {force: 70, drag: 10, stopSpeed: 0.1},
             maxDoubleJump: 3
         },
@@ -38,38 +29,28 @@ function getPlayer() {
  * We evolve the system according to the equation: acceleration = force - drag * initialState.velocity.
  * This equation has a closed form solution of:
  * velocity = (initialState.velocity - force/drag)*e^(-drag * deltaTime) + force/drag
- * position = initialState.position - initialState.velocity/drag + force/drag^2 + force * deltaTime /drag - (initialState.velocity - force/drag)*e^(-drag * deltaTime)  / drag
+ * position = initialState.position - initialState.velocity/drag + force/drag^2 + force * deltaTime /drag -
+ *              (initialState.velocity - force/drag)*e^(-drag * deltaTime)  / drag
  *
  * @param initialState an object containing a position and a velocity
  * @param force an object describing how the object is accelerating
  * @param deltaTime how much time to move the object subject to these parameters
  * @param drag how much drag to apply to the object.
  */
-function stateAfterKinematics(initialState, force = {x:0,y:0}, deltaTime = 0, drag ={x:0.000001,y:0.000001}) {
+function stateAfterKinematics(initialState, force = vec2.zero(), deltaTime = 0, drag ={x:0.000001,y:0.000001}) {
     if (typeof drag === "number") {
         drag = {x: drag, y: drag};
     }
 
-    let newState = {position: {x:0,y:0}, velocity:{x:0,y:0}, size: initialState.size};
+    let newState = {position: vec2.zero(), velocity: vec2.zero(), size: initialState.size};
     //New Equation
-    let targetVelocity = {
-        x: force.x / drag.x,
-        y: force.y / drag.y
-    }
-    let residualVelocity = {
-        x: (initialState.velocity.x - targetVelocity.x) * Math.exp(-drag.x * deltaTime),
-        y: (initialState.velocity.y - targetVelocity.y) * Math.exp(-drag.y * deltaTime)
-    };
-    newState.velocity = {
-        x: residualVelocity.x + targetVelocity.x,
-        y: residualVelocity.y + targetVelocity.y
-    };
-    newState.position = {
-        x: initialState.position.x + targetVelocity.x * deltaTime -
-            (residualVelocity.x - initialState.velocity.x + targetVelocity.x) / drag.x,
-        y: initialState.position.y + targetVelocity.y * deltaTime -
-            (residualVelocity.y - initialState.velocity.y + targetVelocity.y) / drag.y
-    };
+    let targetVelocity = vec2.div(force, drag);
+    let residualMag = vec2.exp(vec2.scalarMul(drag, - deltaTime));
+    let residualVelocity = vec2.mul(vec2.sub(initialState.velocity, targetVelocity), residualMag);
+    newState.velocity = vec2.add(residualVelocity, targetVelocity);
+    newState.position = vec2.sub(vec2.add(initialState.position, vec2.scalarMul(targetVelocity, deltaTime)),
+                                vec2.div(vec2.sub(vec2.add(residualVelocity, targetVelocity), initialState.velocity),
+                                        drag));
     return newState;
 }
 

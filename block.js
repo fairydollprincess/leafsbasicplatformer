@@ -1,6 +1,6 @@
 const BlockFun = {
     build: function (x=0, y=0, w=1, h=1) {
-        return BlockFun.finish({position: {x: x, y: y}, size: {x: w, y: h}});
+        return BlockFun.finish({position: vec2.new(x,y), size: vec2.new(w,h)});
     },
     finish: function (block) {
         if (!Object.hasOwn(block, "graphics")) {
@@ -22,9 +22,9 @@ const BlockFun = {
      * @returns {boolean}
      */
     intersects: function(blockA, blockB) {
-        let posDif = {x: (blockA.position.x - blockB.position.x), y: (blockA.position.y - blockB.position.y)};
-        let avgSize = {x: (blockA.size.x + blockB.size.x)/2, y: (blockA.size.y + blockB.size.y)/2};
-        return Math.abs(posDif.x) < avgSize.x && Math.abs(posDif.y) < avgSize.y;
+        let posDif = vec2.sub(blockA.position, blockB.position);
+        let avgSize = vec2.scalarMul(vec2.add(blockA.size, blockB.size), 0.5);
+        return vec2.xyLess(vec2.abs(posDif), avgSize);
     },
     strictlyAbove: function (thisBlock, thatBlock) {
         return thisBlock.position.y >= thatBlock.position.y + (thisBlock.size.y + thatBlock.size.y)/2;
@@ -40,8 +40,8 @@ const BlockFun = {
     },
     // check bottom of player touches block
     onBlock: function (thisBlock, thatBlock){
-        let posDif = {x: (thisBlock.position.x - thatBlock.position.x), y: (thisBlock.position.y - thatBlock.position.y)};
-        let avgSize = {x: (thisBlock.size.x + thatBlock.size.x)/2, y: (thisBlock.size.y + thatBlock.size.y)/2};
+        let posDif = vec2.sub(thisBlock.position, thatBlock.position);
+        let avgSize = vec2.scalarMul(vec2.add(thisBlock.size, thatBlock.size), 0.5);
         return Math.abs(posDif.x) < avgSize.x && Math.abs(posDif.y - avgSize.y) < 0.000000001;
     }
 };

@@ -1,41 +1,58 @@
-function worldToScreenScale(camera) {
-    const minScreenDim = Math.min(camera.canvas.clientHeight, camera.canvas.clientWidth);
-    return minScreenDim / camera.viewSize;
+const camUtil = {
+    worldToScreenScale: function(camera) {
+        const minScreenDim = Math.min(camera.canvas.clientHeight, camera.canvas.clientWidth);
+        return minScreenDim / camera.viewSize;
+    },
+    getHalfViewSize: function(camera) {
+        return vec2.new(camera.canvas.clientWidth/2, camera.canvas.clientHeight/2);
+    },
+    screenPosToWorldPos: function(screenPosition, camera) {
+        const halfViewSize = camUtil.getHalfViewSize(camera);
+        let relScreenPos = vec2.new( screenPosition.x - halfViewSize.x, halfViewSize.y - screenPosition.y);
+        const cameraRelPos = vec2.scalarMul(relScreenPos, 1/camUtil.worldToScreenScale(camera));
+        return vec2.add(cameraRelPos, camera.position);
+    },
+    worldPosToScreenPos: function(position, camera) {
+        const scale = camUtil.worldToScreenScale(camera);
+        //Translating coordinate system so that y is up and zero is at the bottom.
+        const camRelPos = vec2.sub(position, camera.position);
+        const halfViewSize = camUtil.getHalfViewSize(camera);
+        return vec2.new(halfViewSize.x + scale * camRelPos.x,
+            halfViewSize.y - scale * camRelPos.y);
+    }
 }
 
 function drawBlock(color, position, size, camera){
+    const screenPos = camUtil.worldPosToScreenPos(position, camera);
+    const screenSize = vec2.scalarMul(size, camUtil.worldToScreenScale(camera));
     camera.context.fillStyle = color;
-
-    //Gets the average Screen Size
-    const scale = worldToScreenScale(camera);
-
-    //Translating coordinate system so that y is up and zero is at the bottom.
-    const cameraRelX = position.x - camera.position.x;
-    const cameraRelY = position.y - camera.position.y;
-    const screenX = (camera.canvas.clientWidth/2) + scale * cameraRelX;
-    const screenY = (camera.canvas.clientHeight/2) - scale * cameraRelY;
-    const screenWidth = scale * size.x;
-    const screenHeight = scale * size.y;
-
-    //position is middle of rectangle.
-    camera.context.fillRect(screenX - screenWidth/2, screenY - screenHeight/2, screenWidth, screenHeight);
+    camera.context.fillRect(screenPos.x - screenSize.x/2, screenPos.y - screenSize.y/2, screenSize.x, screenSize.y);
 }
 
-function screenPosToWorldPos(screenPosition, camera) {
-    let relScreenPos = {
-        x: screenPosition.x - (camera.canvas.clientWidth/2),
-        y: (camera.canvas.clientHeight/2) - screenPosition.y
-    };
-    const screenToWorldScale = 1/worldToScreenScale(camera);
-    const cameraRelPos = {x: relScreenPos.x * screenToWorldScale, y: relScreenPos.y * screenToWorldScale};
-    return {x: cameraRelPos.x + camera.position.x, y: cameraRelPos.y + camera.position.y};
+
+function drawRing(position, radius, camera, fillColor = null, edgeColor = null, edgeWidth = 0){
+    const screenPos = camUtil.worldPosToScreenPos(position, camera);
+    const scale = camUtil.worldToScreenScale(camera);
+    const screenRadius = radius * scale;
+    camera.context.beginPath();
+    camera.context.arc(screenPos.x, screenPos.y, screenRadius, 0, 2 * Math.PI, false);
+
+    if (fillColor) {
+        camera.context.fillStyle = fillColor;
+        camera.context.fill();
+    }
+    if (edgeColor) {
+        camera.context.lineWidth = edgeWidth * scale;
+        camera.context.strokeStyle = edgeColor;
+        camera.context.stroke();
+    }
 }
 
 function getCamera(){
     const canvas = document.getElementById("screen");
     const context = canvas.getContext("2d");
     return {
-        position: {x: 0, y: 2},
+        position: vec2.new(0, 2),
         viewSize: 30,
         canvas: canvas,
         context: context
