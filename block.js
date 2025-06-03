@@ -12,7 +12,7 @@ const BlockFun = {
         return block;
     },
     draw: function (block, camera) {
-        drawBlock(block.graphics.color, block.position, block.size, camera);
+        camUtil.drawBlock(camera, block, block.graphics.color);
     },
     /**
      * Returns whether blockA intersects blockB, i.e. whether there is a point in both blocks.
@@ -25,6 +25,10 @@ const BlockFun = {
         let posDif = vec2.sub(blockA.position, blockB.position);
         let avgSize = vec2.scalarMul(vec2.add(blockA.size, blockB.size), 0.5);
         return vec2.xyLess(vec2.abs(posDif), avgSize);
+    },
+    contains: function(block, position) {
+        let posDif = vec2.sub(block.position, position);
+        return vec2.xyLess(vec2.abs(posDif), vec2.scalarMul(block.size, 0.5));
     },
     strictlyAbove: function (thisBlock, thatBlock) {
         return thisBlock.position.y >= thatBlock.position.y + (thisBlock.size.y + thatBlock.size.y)/2;

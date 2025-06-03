@@ -125,7 +125,7 @@ function drawLevel(){
 
 // draws spawn point
 function drawSpawnPoint(spawnPoint, camera){
-    drawRing(spawnPoint, 0.5, camera, "black", "white", 0.2);
+    camUtil.drawRing(camera, spawnPoint, 0.5, "black", "white", 0.2);
 }
 readMapFromHTMLTextField();
 drawLevel();

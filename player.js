@@ -132,16 +132,20 @@ function isOnGround(player, allBlocks){
     return false;
 }
 
+function reSpawnPlayer(player, worldData) {
+    player.position = worldData.map.spawnData.spawnPoint;
+    player.velocity = {x: 0, y: 0};
+}
+
 // checks if player is out of bounds and resets player
 function resetIfOutofBounds(player, worldData){
     if (!BlockFun.intersects(player, worldData.map.spawnData.bounds)){
-        player.position = worldData.map.spawnData.spawnPoint;
-        player.velocity = {x: 0, y: 0};
+        reSpawnPlayer(player, worldData);
     }
 }
 
 function drawPlayer(player, camera){
-    drawBlock("pink", player.position, player.size, camera);
+    camUtil.drawBlock(camera, player, "pink");
 }
 
 // make player not fall through the blocks by checking if they're intersecting a block

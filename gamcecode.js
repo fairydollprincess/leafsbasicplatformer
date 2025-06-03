@@ -1,29 +1,37 @@
-var currentGameInPlay = startGame(getDefaultMapData(), getPlayer());
-
 const MENU_STATE_IN_GAME = "inGame";
 const MENU_STATE_PAUSED = "paused";
+const MENU_STATE_LEVEL_SELECT = "levelSelect";
 
 var menuState = {
     controller: getDefaultInput(),
-    state: MENU_STATE_IN_GAME
+    state: MENU_STATE_LEVEL_SELECT,
+    currentGameInPlay: startGame(getDefaultMapData(), getPlayer()),
+    levelSelectMenu: getLevelSelectMenu()
 }
-
 
 function update(){
     if (menuState.state === MENU_STATE_IN_GAME) {
         if (menuState.controller.pressPause()) {
             menuState.state = MENU_STATE_PAUSED;
-            pauseGame(currentGameInPlay);
+            pauseGame(menuState.currentGameInPlay);
         } else {
-            gameFullUpdate(currentGameInPlay);
+            gameFullUpdate(menuState.currentGameInPlay);
         }
     } else if (menuState.state === MENU_STATE_PAUSED) {
         if (menuState.controller.pressPause()) {
             menuState.state = MENU_STATE_IN_GAME;
-            unPauseGame(currentGameInPlay);
+            unPauseGame(menuState.currentGameInPlay);
         } else {
-            gameRender(currentGameInPlay);
-            camUtil.drawText(currentGameInPlay.camera, "PAUSED", vec2.new(0, 0.5));
+            gameRender(menuState.currentGameInPlay);
+            camUtil.drawText(menuState.levelSelectMenu.camera, "PAUSED", vec2.new(0, 0.5));
+        }
+    } else if (menuState.state === MENU_STATE_LEVEL_SELECT) {
+        let selectedLevel = getSelectedLevel(menuState.levelSelectMenu);
+        if (selectedLevel) {
+            menuState.currentGameInPlay = startGame(selectedLevel, getPlayer());
+            menuState.state = MENU_STATE_IN_GAME;
+        } else {
+            drawLevelSelect(menuState.levelSelectMenu);
         }
     }
     menuState.controller.endFrame();

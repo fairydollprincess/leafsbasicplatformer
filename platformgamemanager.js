@@ -1,7 +1,7 @@
 const MAX_GAME_FRAME_TIME = 0.1;
 
 function startGame(map, player) {
-    return {
+    let worldData = {
         gravity: -100,
         player: player,
         time: {
@@ -11,8 +11,10 @@ function startGame(map, player) {
             deltaTime: 0,
         },
         map: map,
-        camera: getCamera()
+        camera: camUtil.getCamera(map.graphics.viewCenter, map.graphics.viewSize)
     };
+    reSpawnPlayer(player, worldData);
+    return worldData;
 }
 
 //Just sets the deltaTime we will use when the game resumes.
