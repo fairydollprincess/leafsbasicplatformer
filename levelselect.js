@@ -58,22 +58,24 @@ function MapDataAsLevelOption(mapJSON, optionLocation) {
 const LEVEL_OPTION_GRID_COLUMNS = 2;
 const LEVEL_OPTION_GRID_ROWS = 3;
 
-const LEVEL_OPTION_WIDTH = 0.5;
-const LEVEL_OPTION_HEIGHT = 0.5;
+const GAP_RATIO = 0.2;
 
 function LevelListToView() {
     let formatedLevels = [];
+    let totalWidth = LEVEL_OPTION_GRID_COLUMNS + GAP_RATIO;
+    let totalHeight = LEVEL_OPTION_GRID_ROWS + GAP_RATIO;
     for (let i = 0; i < LEVELS_AS_JSON.length; i++) {
         let thisLevel = LEVELS_AS_JSON[i];
         let gridX = i % LEVEL_OPTION_GRID_COLUMNS;
         let gridY = Math.floor(i / LEVEL_OPTION_GRID_COLUMNS);
-        let xPosInZeroTo1 = (gridX+1) / (LEVEL_OPTION_GRID_COLUMNS + 1);
-        let yPosInZeroTo1 = (gridY+1) / (LEVEL_OPTION_GRID_ROWS + 1);
+
+        let xPosInZeroTo1 = (gridX+0.5 + GAP_RATIO/2) / totalWidth;
+        let yPosInZeroTo1 = (gridY+0.5 + GAP_RATIO/2) / totalHeight;
 
         let normalizedXPos = 2*xPosInZeroTo1 - 1;
         let normalizedYPos = 1-2*yPosInZeroTo1;
 
-        let position = BlockFun.build(normalizedXPos, normalizedYPos, LEVEL_OPTION_WIDTH, LEVEL_OPTION_HEIGHT);
+        let position = BlockFun.build(normalizedXPos, normalizedYPos, 2*(1-GAP_RATIO)/LEVEL_OPTION_GRID_COLUMNS, 2*(1-GAP_RATIO)/LEVEL_OPTION_GRID_ROWS);
 
         let levelInMenu = MapDataAsLevelOption(thisLevel, position);
         formatedLevels.push(levelInMenu);
