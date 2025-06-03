@@ -3,7 +3,6 @@ const MENU_STATE_PAUSED = "paused";
 const MENU_STATE_LEVEL_SELECT = "levelSelect";
 
 var menuState = {
-    controller: getDefaultInput(),
     state: MENU_STATE_LEVEL_SELECT,
     currentGameInPlay: startGame(getDefaultMapData(), getPlayer()),
     levelSelectMenu: getLevelSelectMenu()
@@ -11,14 +10,14 @@ var menuState = {
 
 function update(){
     if (menuState.state === MENU_STATE_IN_GAME) {
-        if (menuState.controller.pressPause()) {
+        if (GameInput.anyPressPause()) {
             menuState.state = MENU_STATE_PAUSED;
             pauseGame(menuState.currentGameInPlay);
         } else {
             gameFullUpdate(menuState.currentGameInPlay);
         }
     } else if (menuState.state === MENU_STATE_PAUSED) {
-        if (menuState.controller.pressPause()) {
+        if (GameInput.anyPressPause()) {
             menuState.state = MENU_STATE_IN_GAME;
             unPauseGame(menuState.currentGameInPlay);
         } else {
@@ -34,7 +33,7 @@ function update(){
             drawLevelSelect(menuState.levelSelectMenu);
         }
     }
-    menuState.controller.endFrame();
+    GameInput.endInputFrame();
     requestAnimationFrame(update);
 }
 update();

@@ -1,5 +1,4 @@
-
-function getPlayer() {
+function getPlayer(controller = GameInput.players[0]) {
    return {
         position: vec2.zero(),
         size: vec2.new(0.5, 1),
@@ -18,7 +17,7 @@ function getPlayer() {
             ground: {force: 70, drag: 10, stopSpeed: 0.1},
             maxDoubleJump: 3
         },
-       input: getDefaultInput()
+       input: controller
     };
 }
 
@@ -119,8 +118,6 @@ function updatePlayer(player, worldData){
     interactWithBlock(player, newState, worldData.map.blocks);
     updatePlayerPositionAndVelocity(player, newState);
     resetIfOutofBounds(player, worldData);
-
-    player.input.endFrame();
 }
 // checks if player is on the ground or a block
 function isOnGround(player, allBlocks){

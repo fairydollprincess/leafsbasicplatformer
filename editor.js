@@ -120,6 +120,7 @@ function drawLevel(){
     if (editorState.mode === BUILDING_BLOCK_STATE) {
         BlockFun.draw(editorState.block, worldData.camera);
     }
+    GameInput.endInputFrame();
     requestAnimationFrame(drawLevel);
 }
 
