@@ -13,44 +13,69 @@ window.addEventListener("gamepaddisconnected", (e) => {
 function gamepadToSourceID(gamepad) {
     return "gamepad " + gamepad.id;
 }
-
-function adjustGamePadInput(rawAxis) {
-    if (Math.abs(rawAxis) <= GAME_PAD_DEAD_ZONE) {
-        return 0;
-    }
-    let clampedAxis = Math.min(Math.abs(rawAxis), 1);
-    let normedAxis = (clampedAxis-GAME_PAD_DEAD_ZONE) / (1 - GAME_PAD_DEAD_ZONE);
-    return normedAxis * Math.sign(rawAxis);
+function NewControllerFromGamepad(gamepad) {
+    return new GamepadController(gamepad);
 }
 
-function NewControllerFromGamepad(gamepad) {
-    let state = {
-        jumpPressedLastFrame: false,
-        pausePressedLastFrame: false
-    };
-    return {
-        state: state,
-        source: gamepadToSourceID(gamepad),
-        pressJump: function() {
-            let toReturn = !state.jumpPressedLastFrame && gamepad.buttons[0].pressed;
-            state.jumpPressedLastFrame = gamepad.buttons[0].pressed;
-            return toReturn;
-        },
-        getHorizontal: function() {
-            let rawX = gamepad.axes[0] + gamepad.buttons[15].value - gamepad.buttons[14].value;
-            return adjustGamePadInput(rawX);
-        },
-        getVertical: function() {
-            let rawY = -gamepad.axes[1] + gamepad.buttons[12].value - gamepad.buttons[13].value;
-            return adjustGamePadInput(rawY);
-        },
-        pressPause: function() {
-            let toReturn = !state.pausePressedLastFrame && gamepad.buttons[9].pressed;
-            state.pausePressedLastFrame = gamepad.buttons[9].pressed;
-            return toReturn;
-        },
-        endFrame: function() {
-            //Don't need to update anything every frame.
+class GamepadController {
+    constructor(gamepad) {
+        this.gamepad = gamepad;
+        this.jumpPressedLastFrame= false;
+        this.pausePressedLastFrame = false;
+        this.source = gamepadToSourceID(gamepad);
+    }
+    pressJump() {
+        let toReturn = !this.jumpPressedLastFrame && this.gamepad.buttons[0].pressed;
+        this.jumpPressedLastFrame = this.gamepad.buttons[0].pressed;
+        return toReturn;
+    }
+    get rawX() {
+        return this.gamepad.axes[0] + this.gamepad.buttons[15].value - this.gamepad.buttons[14].value;
+    }
+    get rawY() {
+        return -this.gamepad.axes[1] + this.gamepad.buttons[12].value - this.gamepad.buttons[13].value;
+    }
+    get rawJoystick() {
+        return vec2.clampUnit(vec2.new(this.rawX, this.rawY));
+    }
+    //Hack to project the unit circle of valid joystick inputs
+    //to the box of valid independent axis.
+    get rawJoystickAsSquare() {
+        return vec2.l2ToLInf(this.rawJoystick);
+    }
+    getMoveDirection() {
+        let rawX = this.rawX;
+        let rawY = this.rawY;
+        let rawDirection = vec2.new(rawX, rawY);
+        let mag = vec2.mag(rawDirection);
+        if (mag < GAME_PAD_DEAD_ZONE) {
+            return vec2.zero();
         }
+        let direction = vec2.scalarDiv(rawDirection, mag);
+        if (mag >= 1) {
+            return direction;
+        }
+        let magAdjustment = (mag - GAME_PAD_DEAD_ZONE) / (1 - GAME_PAD_DEAD_ZONE);
+        return vec2.scalarMul(direction, magAdjustment);
+    }
+    applyDeadZoneToSingleAxis(axis) {
+        if (Math.abs(axis) < GAME_PAD_DEAD_ZONE) {
+            return 0;
+        }
+        return Math.sign(axis) * (Math.abs(axis) - GAME_PAD_DEAD_ZONE) / (1- GAME_PAD_DEAD_ZONE);
+    }
+    getHorizontal() {
+        return this.applyDeadZoneToSingleAxis(this.rawJoystickAsSquare.x);
+    }
+    getVertical() {
+        return this.applyDeadZoneToSingleAxis(this.rawJoystickAsSquare.y);
+    }
+    pressPause() {
+        let toReturn = !this.pausePressedLastFrame && this.gamepad.buttons[9].pressed;
+        this.pausePressedLastFrame = this.gamepad.buttons[9].pressed;
+        return toReturn;
+    }
+    endFrame() {
+        //Don't need to update anything every frame.
     }
 }
