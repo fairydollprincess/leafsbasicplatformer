@@ -33,6 +33,34 @@ const camUtil = {
 
         camera.context.fillText(text,topLeft.x,topLeft.y);
     },
+    screenSpaceDrawTextTopLeft: function(camera, text, location=vec2.zero(), color="Grey", font="50px Arial") {
+        //Flips the y and makes the bottom left the origin.
+        let screenSize = vec2.new(camera.canvas.clientWidth, camera.canvas.clientHeight);
+        let canvasSpaceLocation = vec2.mul(location, screenSize);
+
+        camera.context.fillStyle = color;
+        camera.context.font = font;
+        const textSizeInfo = camera.context.measureText(text);
+        const textSize = vec2.new(0, textSizeInfo.fontBoundingBoxAscent);
+
+        const topLeft = vec2.add(canvasSpaceLocation, textSize);
+
+        camera.context.fillText(text,topLeft.x,topLeft.y);
+    },
+    screenSpaceDrawTextTopCenter: function(camera, text, location=vec2.zero(), color="Grey", font="50px Arial") {
+        //Flips the y and makes the bottom left the origin.
+        let screenSize = vec2.new(camera.canvas.clientWidth, camera.canvas.clientHeight);
+        let canvasSpaceLocation = vec2.mul(location, screenSize);
+
+        camera.context.fillStyle = color;
+        camera.context.font = font;
+        const textSizeInfo = camera.context.measureText(text);
+        const textBasedOffset = vec2.new(-textSizeInfo.width/2, textSizeInfo.fontBoundingBoxAscent);
+
+        const topLeft = vec2.add(canvasSpaceLocation, textBasedOffset);
+
+        camera.context.fillText(text,topLeft.x,topLeft.y);
+    },
     getCamera: function(position = vec2.zero(), viewSize = 1) {
         const canvas = document.getElementById("screen");
         const context = canvas.getContext("2d");

@@ -87,7 +87,9 @@ const LEVELS_AS_JSON = [
     `{"spawnData":{"spawnPoint":{"x":-13,"y":13},"bounds":{"position":{"x":0,"y":0},"size":{"x":100,"y":50}}},
         "graphics":{"name":"Overhang","viewSize":"30","viewCenter":{"x":0,"y":0},"color":"#5e14b8"},
         "blocks":[{"position":{"x":-13,"y":10.5},"size":{"x":6,"y":1},"graphics":{"color":"#d040ff"}},{"position":{"x":-9.5,"y":7},"size":{"x":1,"y":6},"graphics":{"color":"#d040ff"}},{"position":{"x":-14.5,"y":6},"size":{"x":3,"y":2},"graphics":{"color":"#d040ff"}},{"position":{"x":-8,"y":4.5},"size":{"x":2,"y":1},"graphics":{"color":"#d040ff"}},{"position":{"x":-13,"y":3.5},"size":{"x":2,"y":1},"graphics":{"color":"#d040ff"}},{"position":{"x":-16.5,"y":1},"size":{"x":1,"y":18},"graphics":{"color":"#d040ff"}},{"position":{"x":-9.5,"y":-10.5},"size":{"x":33,"y":1},"graphics":{"color":"#d040ff"}},{"position":{"x":-23,"y":-5.5},"size":{"x":4,"y":1},"graphics":{"color":"#d040ff"}},{"position":{"x":-18.5,"y":0},"size":{"x":3,"y":2},"graphics":{"color":"#d040ff"}},{"position":{"x":-23,"y":4.5},"size":{"x":4,"y":1},"graphics":{"color":"#d040ff"}},{"position":{"x":16,"y":-8.5},"size":{"x":16,"y":5},"graphics":{"color":"#d040ff"}},{"position":{"x":-15.5,"y":8.5},"size":{"x":1,"y":1},"graphics":{"color":"#ff94e8"}}]}
-        `, `{
+        `
+    ,
+    `{
 "spawnData": {
     "spawnPoint": {"x": 0, "y": 0},
     "bounds": {"position": {"x": 0, "y": 0}, "size": {"x": 60, "y": 30}}
@@ -97,6 +99,12 @@ const LEVELS_AS_JSON = [
     "viewSize": 30,
     "viewCenter": {"x": 0, "y": 0},
     "color": "purple"
+},
+"collectMode": {
+    "hearts": [
+    {
+        "position": {"x": -15, "y": 6} 
+    }]
 },
 "blocks": 
 [

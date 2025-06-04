@@ -56,6 +56,15 @@ const MapFun = {
         for (let block of map.blocks) {
             BlockFun.finish(block);
         }
+        if (map.collectMode) {
+            for (let heart of map.collectMode.hearts) {
+                heart.size = {x: 0.5, y: 0.5};
+            }
+        } else {
+            map.collectMode = {
+                hearts: []
+            }
+        }
         return map;
     },
     write: function (map) {
@@ -78,6 +87,12 @@ const mapData = `{
     "viewSize": 30,
     "viewCenter": {"x": 0, "y": 0},
     "color": "purple"
+},
+"collectMode": {
+    "hearts": [
+    {
+        "position": {"x": -15, "y": 6} 
+    }]
 },
 "blocks": 
 [

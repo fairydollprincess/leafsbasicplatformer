@@ -10,11 +10,42 @@ function startGame(map, player) {
             gameTime: 0,
             deltaTime: 0,
         },
+        gameMode: {
+            heartCounter: 0,
+            hearts: map.collectMode.hearts
+        },
         map: map,
         camera: camUtil.getCamera(map.graphics.viewCenter, map.graphics.viewSize)
     };
     reSpawnPlayer(player, worldData);
     return worldData;
+}
+
+function countHearts(worldData){
+    // check if touching a heart
+    let kept = [];
+    for(let heart of worldData.gameMode.hearts){
+        if(BlockFun.intersects(heart, worldData.player)){
+            //Delete the heart and increment heart counter.
+            worldData.gameMode.heartCounter++;
+        } else {
+            kept.push(heart);
+        }
+    }
+    worldData.gameMode.hearts = kept;
+}
+
+function drawHearts(worldData) {
+    for (let heart of worldData.gameMode.hearts) {
+        camUtil.drawBlock(worldData.camera, heart, "#ffc0d0");
+    }
+    camUtil.screenSpaceDrawTextTopLeft(worldData.camera, "hearts: " + worldData.gameMode.heartCounter,
+        vec2.new(0.01, .01), "#ffc0d0", "30px Garamond");
+    // check if all hearts are collected
+    if(worldData.gameMode.hearts.length === 0) {
+        camUtil.screenSpaceDrawTextTopCenter(worldData.camera, "you got all the hearts" ,
+            vec2.new(0.5, 0), "#e85f83", "40px Garamond");
+    }
 }
 
 //Just sets the deltaTime we will use when the game resumes.
@@ -39,13 +70,16 @@ function updateTime(worldTime) {
 
 function gameLogicUpdate(worldData) {
     updateTime(worldData.time);
-    updatePlayer(worldData.player, worldData)
+    updatePlayer(worldData.player, worldData);
+    countHearts(worldData);
+
 }
 
 function gameRender(worldData) {
     drawBackground(worldData.camera, worldData.map.graphics.color);
     MapFun.draw(worldData.map, worldData.camera);
     drawPlayer(worldData.player, worldData.camera);
+    drawHearts(worldData);
 }
 
 function gameFullUpdate(worldData) {
