@@ -1,7 +1,7 @@
 const LEFT_KEYBOARD_ID = "leftKeyboard";
 const RIGHT_KEYBOARD_ID = "rightKeyboard";
 const LEFT_PLAYER_BUTTONS = new Set(["w","a","s","d"," "]);
-const RIGHT_PLAYER_BUTTONS = new Set(["w","a","s","d"," "]);
+const RIGHT_PLAYER_BUTTONS = new Set(["arrowleft","arrowright","arrowup","arrowdown"]);
 
 function getKeyBoardLeftPlayer(startingKey) {
     const keySet = new Set();
