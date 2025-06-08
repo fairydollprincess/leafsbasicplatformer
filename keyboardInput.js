@@ -55,6 +55,9 @@ function getKeyBoardLeftPlayer(startingKey) {
         endFrame: function() {
             keyUpSet.clear();
             keyDownSet.clear();
+        },
+        clicked: function() {
+            return keyDownSet.has(" ");
         }
     }
 }
@@ -111,6 +114,9 @@ function getKeyBoardRightPlayer(startingKey) {
         endFrame: function() {
             keyUpSet.clear();
             keyDownSet.clear();
+        },
+        clicked: function() {
+            return keyDownSet.has("m");
         }
     }
 }

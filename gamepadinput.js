@@ -78,4 +78,9 @@ class GamepadController {
     endFrame() {
         //Don't need to update anything every frame.
     }
+    clicked() {
+        let toReturn = !this.jumpPressedLastFrame && this.gamepad.buttons[0].pressed;
+        this.jumpPressedLastFrame = this.gamepad.buttons[0].pressed;
+        return toReturn;
+    }
 }

@@ -2,6 +2,7 @@ const MAX_INPUT_FRAME_TIME = 0.04;
 
 const GameInput = {
     players: [],
+    mice: [],
     inputTime: {
         time: Date.now(),
         deltaTime: 0
@@ -18,7 +19,7 @@ const GameInput = {
     endInputFrame: function () {
         //Update time
         let newTime = Date.now();
-        GameInput.deltaTime = (GameInput.time - newTime) / 1000;
+        GameInput.deltaTime = (newTime - GameInput.time) / 1000;
         if (GameInput.deltaTime > MAX_INPUT_FRAME_TIME) {
             GameInput.deltaTime = MAX_INPUT_FRAME_TIME;
         }
@@ -29,6 +30,9 @@ const GameInput = {
                 player.inputMethod.endFrame();
                 player.updateVirtualMouse(GameInput.deltaTime);
             }
+        }
+        for (let mouse of this.mice) {
+            mouse.endFrame();
         }
     },
     anyPressPause: function () {
@@ -52,6 +56,9 @@ const GameInput = {
                 player.resetInput(null);
             }
         }
+    },
+    addMouse: function (clickManager) {
+        this.mice.push(clickManager);
     }
 };
 
@@ -94,8 +101,8 @@ class PlayerInput {
         if (this.inputMethod.getMoveDirection) {
             return this.inputMethod.getMoveDirection();
         }
-        let direction = vec2.new(this.getHorizontal(), this.getHorizontal());
-        return vec2.clampUnit(direction);
+        let direction = vec2.new(this.getHorizontal(), this.getVertical());
+        return vec2.lInfTo2(direction);
     }
 
     getHorizontal() {
@@ -122,6 +129,12 @@ class PlayerInput {
     }
     pressPause () {
         return this.inputMethod && this.inputMethod.pressPause();
+    }
+    clicked () {
+        if (!this.inputMethod || ! this.inputMethod.clicked) {
+            return false;
+        }
+        return this.inputMethod.clicked();
     }
 }
 

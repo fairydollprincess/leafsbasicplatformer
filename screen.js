@@ -71,7 +71,14 @@ const camUtil = {
             context: context
         };
     },
-    drawBlock: function(camera, block, color="black") {
+    drawBlock: function(camera, block, color=null) {
+        if (!color) {
+            if (block.graphics && block.graphics.color) {
+                color = block.graphics.color;
+            } else {
+                color = "black";
+            }
+        }
         const screenPos = camUtil.worldPosToScreenPos(block.position, camera);
         const screenSize = vec2.scalarMul(block.size, camUtil.worldToScreenScale(camera));
         camera.context.fillStyle = color;
@@ -94,13 +101,6 @@ const camUtil = {
             camera.context.stroke();
         }
     }
-}
-
-function drawBlock(color, position, size, camera){
-    const screenPos = camUtil.worldPosToScreenPos(position, camera);
-    const screenSize = vec2.scalarMul(size, camUtil.worldToScreenScale(camera));
-    camera.context.fillStyle = color;
-    camera.context.fillRect(screenPos.x - screenSize.x/2, screenPos.y - screenSize.y/2, screenSize.x, screenSize.y);
 }
 
 function getCamera(){

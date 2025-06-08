@@ -99,6 +99,16 @@ const vec2 = {
         let l2Length = vec2.mag(vec);
         let scale = l2Length/lInfLength;
         return vec2.scalarMul(vec, scale);
+    },
+    lInfTo2: function (vec) {
+        let lInfLength = vec2.lInfNorm(vec);
+        if (lInfLength <= 0.0000001) {
+            //If the norm is small enough we may have to worry about numerical precision, just return
+            return vec;
+        }
+        let l2Length = vec2.mag(vec);
+        let scale = lInfLength / l2Length;
+        return vec2.scalarMul(vec, scale);
     }
 }
 
