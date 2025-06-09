@@ -11,7 +11,7 @@ function BuildPauseMenu(MenuManager, EndLevelCallBack, UnpauseCallback) {
                     }
                 },
                 content: {
-                    label: "ARE YOU SURE YOU WANT TO LEAVE THE LEVEL?"
+                    label: "Are you sure you want to EXIT the level?"
                 }
             },
             menuData: {

@@ -3,6 +3,10 @@ const camUtil = {
         const minScreenDim = Math.min(camera.canvas.clientHeight, camera.canvas.clientWidth);
         return minScreenDim / camera.viewSize;
     },
+    screenToWorldScale: function(camera) {
+        const minScreenDim = Math.min(camera.canvas.clientHeight, camera.canvas.clientWidth);
+        return camera.viewSize/ minScreenDim;
+    },
     getHalfViewSize: function(camera) {
         return vec2.new(camera.canvas.clientWidth/2, camera.canvas.clientHeight/2);
     },
@@ -20,18 +24,56 @@ const camUtil = {
         return vec2.new(halfViewSize.x + scale * camRelPos.x,
             halfViewSize.y - scale * camRelPos.y);
     },
-    drawText: function(camera, text, location=vec2.zero(), color="Grey", font="50px Arial") {
+    wrapText: function (camera, text, font, maxWidth) {
+        let words = text.split(" ");
+        if (words.length <= 0) {
+            return [text];
+        }
+        let lines = [];
+        let currentLine = words[0];
+        camera.context.font = font;
+        //Skip the first word.
+        for (let i = 1; i < words.length; i++) {
+            let lineWithExtraWord = currentLine + " " + words[i];
+            const textSizeInfo = camera.context.measureText(lineWithExtraWord);
+            let worldWidth = camUtil.screenToWorldScale(camera) * textSizeInfo.width;
+            if (worldWidth >= maxWidth) {
+                lines.push(currentLine);
+                currentLine = words[i];
+            } else {
+                currentLine = lineWithExtraWord;
+            }
+        }
+        lines.push(currentLine);
+        return lines;
+    },
+    drawText: function(camera, text, location=vec2.zero(), color="Grey", font="50px Arial", maxWidth = null, lineSpacing=1.15) {
         //Flips the y and makes the bottom left the origin.
         const canvasSpaceLocation = camUtil.worldPosToScreenPos(location, camera);
 
         camera.context.fillStyle = color;
         camera.context.font = font;
+
+        var lines;
+        if (maxWidth) {
+            lines = camUtil.wrapText(camera, text, font, maxWidth);
+        } else {
+            lines = [text];
+        }
+        // Get the height
         const textSizeInfo = camera.context.measureText(text);
-        const textSize = vec2.new(textSizeInfo.width, -textSizeInfo.fontBoundingBoxAscent);
+        const lineHeight = textSizeInfo.fontBoundingBoxAscent;
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let lineHeightOffset = lineHeight * lineSpacing * (i - (lines.length-1)/2);
 
-        const topLeft = vec2.sub(canvasSpaceLocation, vec2.scalarMul(textSize, 0.5));
+            const textSizeInfo = camera.context.measureText(line);
 
-        camera.context.fillText(text,topLeft.x,topLeft.y);
+            const textOffset = vec2.new(-textSizeInfo.width*0.5, lineHeightOffset + lineHeight/2);
+            const topLeft = vec2.add(canvasSpaceLocation, textOffset);
+
+            camera.context.fillText(line,topLeft.x,topLeft.y);
+        }
     },
     screenSpaceDrawTextTopLeft: function(camera, text, location=vec2.zero(), color="Grey", font="50px Arial") {
         //Flips the y and makes the bottom left the origin.

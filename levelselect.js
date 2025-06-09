@@ -1,67 +1,23 @@
-function getLevelMouseOver(event, levelMenu) {
-    const htmlPosition = {x: event.offsetX, y: event.offsetY};
-    const worldPosition = camUtil.screenPosToWorldPos(htmlPosition, levelMenu.camera);
-    for (let level of levelMenu.levels) {
-        if (BlockFun.contains(level.selectionMenu.screenPosition, worldPosition)) {
-            return level;
-        }
-    }
-    return null;
-}
-
-function getLevelSelectMenu() {
-    const camera = camUtil.getCamera(vec2.zero(), 2);
-    const levels = LevelListToView();
-    const levelMenu = {levels: levels, camera: camera, highlightedLevel: null, selectedLevel: null};
-    document.getElementById("screen").addEventListener("click", (event) => {
-        levelMenu.selectedLevel = getLevelMouseOver(event, levelMenu);
-    });
-    document.getElementById("screen").addEventListener("mousemove", (event) => {
-        levelMenu.highlightedLevel = getLevelMouseOver(event, levelMenu);
-    });
-    return levelMenu;
-}
-
-function drawLevelSelect(levelMenu) {
-    drawBackground(levelMenu.camera, "#ffa0e0");
-    if (levelMenu.highlightedLevel) {
-        let levelBlock = levelMenu.highlightedLevel.selectionMenu.screenPosition;
-        let highlightArea = BlockFun.build(levelBlock.position.x, levelBlock.position.y, levelBlock.size.x + 0.1, levelBlock.size.y + 0.1 );
-        camUtil.drawBlock(levelMenu.camera, highlightArea, "gold");
-    }
-
-    for (let level of levelMenu.levels) {
-        camUtil.drawBlock(levelMenu.camera, level.selectionMenu.screenPosition, level.selectionMenu.color);
-        camUtil.drawText(levelMenu.camera, level.selectionMenu.name, level.selectionMenu.screenPosition.position, "black", "15px Arial");
-    }
-}
-
-function getSelectedLevel(levelMenu) {
-    if (levelMenu.selectedLevel) {
-        return levelMenu.selectedLevel.map;
-    }
-    return null;
-}
-
-function MapDataAsLevelOption(mapJSON, optionLocation) {
-    let map = MapFun.read(mapJSON);
-    return {
-        selectionMenu: {
-            screenPosition: optionLocation,
-            name: map.graphics.name,
-            color: map.graphics.color
-        },
-        map: map
-    }
-}
-
 const LEVEL_OPTION_GRID_COLUMNS = 2;
 const LEVEL_OPTION_GRID_ROWS = 3;
 
 const GAP_RATIO = 0.2;
 
-function LevelListToView() {
-    let formatedLevels = [];
+function getLevelSelectMenu(MenuManager, selectLevelCallback) {
+    let formatedLevels = [{
+        display: {
+            position: {
+                position: vec2.zero(),
+                size: vec2.new(4, 4),
+                graphics: {
+                    color: "#ffa0e0"
+                }
+            }
+        },
+        menuData: {
+            clickable: false
+        }
+    }];
     let totalWidth = LEVEL_OPTION_GRID_COLUMNS + GAP_RATIO;
     let totalHeight = LEVEL_OPTION_GRID_ROWS + GAP_RATIO;
     for (let i = 0; i < LEVELS_AS_JSON.length; i++) {
@@ -77,10 +33,25 @@ function LevelListToView() {
 
         let position = BlockFun.build(normalizedXPos, normalizedYPos, 2*(1-GAP_RATIO)/LEVEL_OPTION_GRID_COLUMNS, 2*(1-GAP_RATIO)/LEVEL_OPTION_GRID_ROWS);
 
-        let levelInMenu = MapDataAsLevelOption(thisLevel, position);
+        let levelInMenu = MapDataAsLevelOption(thisLevel, position, selectLevelCallback);
         formatedLevels.push(levelInMenu);
     }
-    return formatedLevels;
+    return MenuManager.newMenu(formatedLevels);
+}
+
+function MapDataAsLevelOption(mapJSON, optionLocation,callback) {
+    let map = MapFun.read(mapJSON);
+    optionLocation.graphics = {color: map.graphics.color};
+    return {
+        display: {
+            position: optionLocation,
+            content: {
+                label: map.graphics.name
+            },
+        },
+        value: map,
+        callback: callback
+    }
 }
 
 const LEVELS_AS_JSON = [

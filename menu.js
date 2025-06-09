@@ -9,8 +9,6 @@ class Menu {
      *
      *              display will be printed in the middle square of the screen. 0,0 is the center of the screen,
      *              1,1 the top right of the center square, and -1,-1 is the bottom left of the center square.
-     *              Optionally, an option may also contain a 'callback' option that will be called whenever the
-     *              box is clicked. This callback option will be
      *
      * 'callback': This function will be called whenever this button is clicked. It will be passed
      *             value stored in value as well as the index of the player that clicked on the button
@@ -62,14 +60,19 @@ class Menu {
             }
             camUtil.drawBlock(camera, option.display.position);
             if (option.display.content) {
-                camUtil.drawText(camera, option.display.content.label, option.display.position.position, "black", "15px Arial");
+                camUtil.drawText(camera,
+                    option.display.content.label,
+                    option.display.position.position,
+                    "black",
+                    "15px Arial",
+                    option.display.position.size.x);
             }
         }
     }
 
     overButton(position) {
         for (let option of this.options) {
-            if (BlockFun.contains(option.display.position, position)) {
+            if (BlockFun.contains(option.display.position, position) && option.menuData.clickable) {
                 return option;
             }
         }

@@ -59,6 +59,11 @@ const GameInput = {
     },
     addMouse: function (clickManager) {
         this.mice.push(clickManager);
+    },
+    resetMice: function () {
+        for (let player of GameInput.players) {
+            player.virtualMouse.position = vec2.zero();
+        }
     }
 };
 
@@ -68,7 +73,6 @@ class PlayerInput {
         this.resetInput(inputMethod);
         this.virtualMouse = {
             position: vec2.zero(),
-
         };
     }
 
