@@ -65,7 +65,7 @@ function roundToGridPrecision(num) {
 
 function eventToFullPrecisionWorldPosition(event) {
     const htmlPosition = {x: event.offsetX, y: event.offsetY};
-    return camUtil.screenPosToWorldPos(htmlPosition, worldData.camera);
+    return worldData.camera.screenPosToWorldPos(htmlPosition);
 }
 
 function eventToWorldPosition(event) {
@@ -153,8 +153,8 @@ function drawLevel(){
     if (editorState.mode === BUILDING_BLOCK_STATE) {
         BlockFun.draw(editorState.block, worldData.camera);
     }
-    camUtil.drawBlockBorder(worldData.camera, worldData.map.spawnData.bounds, "black", 1);
-    camUtil.drawBlockBorder(worldData.camera, worldData.map.spawnData.bounds, "white", 0.5);
+    worldData.camera.drawBlockBorder(worldData.map.spawnData.bounds, "black", 1);
+    worldData.camera.drawBlockBorder(worldData.map.spawnData.bounds, "white", 0.5);
 
     GameInput.endInputFrame();
     requestAnimationFrame(drawLevel);
@@ -162,7 +162,7 @@ function drawLevel(){
 
 // draws spawn point
 function drawSpawnPoint(spawnPoint, camera){
-    camUtil.drawRing(camera, spawnPoint, 0.5, "black", "white", 0.2);
+    camera.drawRing(spawnPoint, 0.5, "black", "white", 0.2);
 }
 readMapFromHTMLTextField();
 drawLevel();

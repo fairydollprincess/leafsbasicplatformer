@@ -56,11 +56,11 @@ class Menu {
             if (option.menuData.highlighted) {
                 let optionBlock = option.display.position;
                 let highlightArea = BlockFun.build(optionBlock.position.x, optionBlock.position.y, optionBlock.size.x + 0.1, optionBlock.size.y + 0.1 );
-                camUtil.drawBlock(camera, highlightArea, "gold");
+                camera.drawBlock(highlightArea, "gold");
             }
-            camUtil.drawBlock(camera, option.display.position);
+            camera.drawBlock(option.display.position, option.display.position.graphics.color);
             if (option.display.content) {
-                camUtil.drawText(camera,
+                camera.drawText(
                     option.display.content.label,
                     option.display.position.position,
                     "black",

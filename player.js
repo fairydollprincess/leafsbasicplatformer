@@ -142,7 +142,7 @@ function resetIfOutofBounds(player, worldData){
 }
 
 function drawPlayer(player, camera){
-    camUtil.drawBlock(camera, player, "pink");
+    camera.drawBlock(player, "pink");
 }
 
 // make player not fall through the blocks by checking if they're intersecting a block

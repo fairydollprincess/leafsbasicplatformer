@@ -12,7 +12,7 @@ const BlockFun = {
         return block;
     },
     draw: function (block, camera) {
-        camUtil.drawBlock(camera, block, block.graphics.color);
+        camera.drawBlock(block, block.graphics.color);
     },
     /**
      * Returns whether blockA intersects blockB, i.e. whether there is a point in both blocks.

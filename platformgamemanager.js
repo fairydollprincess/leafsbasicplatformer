@@ -15,7 +15,7 @@ function startGame(map, player) {
             hearts: map.collectMode.hearts
         },
         map: map,
-        camera: camUtil.getCamera(map.graphics.viewCenter, map.graphics.viewSize)
+        camera: Camera.makeCam("screen", map.graphics.viewCenter, map.graphics.viewSize)
     };
     reSpawnPlayer(player, worldData);
     return worldData;
@@ -37,13 +37,13 @@ function countHearts(worldData){
 
 function drawHearts(worldData) {
     for (let heart of worldData.gameMode.hearts) {
-        camUtil.drawBlock(worldData.camera, heart, "#ffc0d0");
+        worldData.camera.drawBlock(heart, "#ffc0d0");
     }
-    camUtil.screenSpaceDrawTextTopLeft(worldData.camera, "hearts: " + worldData.gameMode.heartCounter,
+    worldData.camera.screenSpaceDrawTextTopLeft("hearts: " + worldData.gameMode.heartCounter,
         vec2.new(0.01, .01), "#ffc0d0", "30px Garamond");
     // check if all hearts are collected
     if(worldData.gameMode.hearts.length === 0) {
-        camUtil.screenSpaceDrawTextTopCenter(worldData.camera, "you got all the hearts" ,
+        worldData.camera.screenSpaceDrawTextTopCenter("you got all the hearts" ,
             vec2.new(0.5, 0), "#e85f83", "40px Garamond");
     }
 }
@@ -76,7 +76,7 @@ function gameLogicUpdate(worldData) {
 }
 
 function gameRender(worldData) {
-    drawBackground(worldData.camera, worldData.map.graphics.color);
+    worldData.camera.drawBackground(worldData.map.graphics.color);
     MapFun.draw(worldData.map, worldData.camera);
     drawPlayer(worldData.player, worldData.camera);
     drawHearts(worldData);

@@ -1,5 +1,5 @@
 const MenuManager = {
-    camera: camUtil.getCamera(vec2.zero(), 2.0),
+    camera: Camera.makeCam(),
     menuStack: [],
     newMenu: function(initialOptions = null) {
         return new Menu(initialOptions);
@@ -32,13 +32,13 @@ const MenuManager = {
         }
         MenuManager.getCurrentMenu().display(MenuManager.camera);
         for (let player of players) {
-            camUtil.drawRing(MenuManager.camera, player.mousePosition, 0.01, "white", "black", 0.003);
+            MenuManager.camera.drawRing(player.mousePosition, 0.01, "white", "black", 0.003);
         }
         /*
          * In general, mice don't need to be drawn as that is built in, but for testing purposes I will draw them.
          */
         for (let mouse of mice) {
-            camUtil.drawRing(MenuManager.camera, mouse.position, 0.01, "white", "black", 0.003);
+            MenuManager.camera.drawRing(mouse.position, 0.01, "white", "black", 0.003);
         }
     },
     updateMenu: function(players, mice) {
