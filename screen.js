@@ -126,6 +126,17 @@ const camUtil = {
         camera.context.fillStyle = color;
         camera.context.fillRect(screenPos.x - screenSize.x/2, screenPos.y - screenSize.y/2, screenSize.x, screenSize.y);
     },
+    drawBlockBorder: function(camera, block, color, borderWidth=0.5) {
+        const screenPos = camUtil.worldPosToScreenPos(block.position, camera);
+        const screenSize = vec2.scalarMul(block.size, camUtil.worldToScreenScale(camera));
+        const borderSize = borderWidth * camUtil.worldToScreenScale(camera);
+
+        camera.context.beginPath();
+        camera.context.lineWidth = borderSize;
+        camera.context.strokeStyle = color;
+        camera.context.rect(screenPos.x - screenSize.x/2, screenPos.y - screenSize.y/2, screenSize.x, screenSize.y);
+        camera.context.stroke();
+    },
     drawRing: function(camera, position, radius, fillColor = null, edgeColor = null, edgeWidth = 0) {
         const screenPos = camUtil.worldPosToScreenPos(position, camera);
         const scale = camUtil.worldToScreenScale(camera);

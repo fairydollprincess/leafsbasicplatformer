@@ -5,6 +5,11 @@ function changeMap(mapText) {
     document.getElementById("viewSize").value = worldData.camera.viewSize = worldData.map.graphics.viewSize;
 }
 
+function updateEditorCamera() {
+    worldData.camera.viewSize = worldData.map.graphics.viewSize;
+    worldData.camera.position = worldData.map.graphics.viewCenter;
+}
+
 function readMapFromHTMLTextField() {
     changeMap(document.getElementById('readMapInput').value);
 }
@@ -23,11 +28,18 @@ const BUILDING_BLOCK_STATE = "building";
 const EDIITING_BLOCK_STATE = "editing";
 const DELETE_MODE = "deleting";
 const MAKE_SPAWN_POINT = "spawnPoint";
+const CAMERA_MOVE = "cameraMove";
+
 
 var editorState = {
     mode: ADD_MODE,
     clicks: {},
-    block: {}
+    block: {},
+    lastState: [],
+    cameraMove: {
+        clickPos: vec2.zero(),
+        initialScreenPos: vec2.zero(),
+    }
 };
 
 function changeMode() {
@@ -84,9 +96,18 @@ function deleteBlockAtPosition(event) {
 }
 
 
-document.getElementById("screen").addEventListener("click", (event) => {
+document.getElementById("screen").addEventListener("mousedown", (event) => {
     let clickPosition = eventToWorldPosition(event);
-    if (editorState.mode === ADD_MODE) {
+    if (editorState.mode === CAMERA_MOVE && editorState.lastState.length > 0) {
+        editorState.mode = editorState.lastState.pop();
+    } else if (KeyBoardData.keySet.has("control") || event.button === 2) {
+        editorState.lastState.push(editorState.mode);
+        editorState.mode = CAMERA_MOVE;
+        editorState.cameraMove = {
+            clickPos: eventToFullPrecisionWorldPosition(event),
+            initialScreenPos: worldData.map.graphics.viewCenter,
+        };
+    } else if (editorState.mode === ADD_MODE) {
         editorState.mode = BUILDING_BLOCK_STATE;
         editorState.clicks = {click1: clickPosition, click2: clickPosition};
         updateBlock();
@@ -105,11 +126,23 @@ document.getElementById("screen").addEventListener("click", (event) => {
     }
 });
 
+
+document.getElementById("screen").addEventListener("mouseup", (event) => {
+    if (editorState.mode === CAMERA_MOVE && editorState.lastState.length > 0) {
+        editorState.mode = editorState.lastState.pop();
+    }
+});
+
 document.getElementById("screen").addEventListener("mousemove", (event) => {
     let clickPosition = eventToWorldPosition(event);
     if (editorState.mode === BUILDING_BLOCK_STATE) {
         editorState.clicks.click2 = clickPosition;
         updateBlock();
+    } else if (editorState.mode === CAMERA_MOVE) {
+        const fullWorldPosition = eventToFullPrecisionWorldPosition(event);
+        let camOffset = vec2.sub(editorState.cameraMove.clickPos, fullWorldPosition);
+        worldData.map.graphics.viewCenter = vec2.add(worldData.map.graphics.viewCenter, camOffset);
+        updateEditorCamera();
     }
 });
 
@@ -120,6 +153,9 @@ function drawLevel(){
     if (editorState.mode === BUILDING_BLOCK_STATE) {
         BlockFun.draw(editorState.block, worldData.camera);
     }
+    camUtil.drawBlockBorder(worldData.camera, worldData.map.spawnData.bounds, "black", 1);
+    camUtil.drawBlockBorder(worldData.camera, worldData.map.spawnData.bounds, "white", 0.5);
+
     GameInput.endInputFrame();
     requestAnimationFrame(drawLevel);
 }

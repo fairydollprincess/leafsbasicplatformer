@@ -3,129 +3,105 @@ const RIGHT_KEYBOARD_ID = "rightKeyboard";
 const LEFT_PLAYER_BUTTONS = new Set(["w","a","s","d"," "]);
 const RIGHT_PLAYER_BUTTONS = new Set(["arrowleft","arrowright","arrowup","arrowdown"]);
 
-function getKeyBoardLeftPlayer(startingKey) {
-    const keySet = new Set();
-    const keyDownSet = new Set();
-    const keyUpSet = new Set();
-    if (startingKey) {
-        keySet.add(startingKey);
-        keyDownSet.add(startingKey);
-    }
-    document.addEventListener("keydown", (event) => {
-        keySet.add(event.key.toLowerCase());
-        keyDownSet.add(event.key.toLowerCase())
-    });
-    document.addEventListener("keyup", (event) => {
-        keySet.delete(event.key.toLowerCase());
-        keyUpSet.add(event.key.toLowerCase());
-    });
+const KeyBoardData = {
+    keySet: new Set(),
+    keyDownSet: new Set(),
+    keyUpSet: new Set()
+}
+document.addEventListener("keydown", (event) => {
+    KeyBoardData.keySet.add(event.key.toLowerCase());
+    KeyBoardData.keyDownSet.add(event.key.toLowerCase())
+});
+document.addEventListener("keyup", (event) => {
+    KeyBoardData.keySet.delete(event.key.toLowerCase());
+    KeyBoardData.keyUpSet.add(event.key.toLowerCase());
+});
+
+function getKeyBoardLeftPlayer() {
     return {
-        state: {
-            keySet: keySet,
-            keyDownSet: keyDownSet,
-            keyUpSet: keyUpSet,
-        },
+        state: KeyBoardData,
         source: LEFT_KEYBOARD_ID,
         pressJump: function() {
-            return keyDownSet.has("w") || keyDownSet.has(" ");
+            return KeyBoardData.keyDownSet.has("w") || KeyBoardData.keyDownSet.has(" ");
         },
         getHorizontal: function() {
             let val = 0;
-            if (keySet.has("d")) {
+            if (KeyBoardData.keySet.has("d")) {
                 val++;
             }
-            if (keySet.has("a")) {
+            if (KeyBoardData.keySet.has("a")) {
                 val--;
             }
             return val;
         },
         getVertical: function() {
             let val = 0;
-            if (keySet.has("w")) {
+            if (KeyBoardData.keySet.has("w")) {
                 val++;
             }
-            if (keySet.has("s")) {
+            if (KeyBoardData.keySet.has("s")) {
                 val--;
             }
             return val;
         },
         pressPause: function() {
-            return keyDownSet.has("p");
+            return KeyBoardData.keyDownSet.has("p");
         },
         endFrame: function() {
-            keyUpSet.clear();
-            keyDownSet.clear();
+            KeyBoardData.keyUpSet.clear();
+            KeyBoardData.keyDownSet.clear();
         },
         clicked: function() {
-            return keyDownSet.has(" ");
+            return KeyBoardData.keyDownSet.has(" ");
         }
     }
 }
 
 function getKeyBoardRightPlayer(startingKey) {
-    const keySet = new Set();
-    const keyDownSet = new Set();
-    const keyUpSet = new Set();
-    if (startingKey) {
-        keySet.add(startingKey);
-        keyDownSet.add(startingKey);
-    }
-    document.addEventListener("keydown", (event) => {
-        keySet.add(event.key.toLowerCase());
-        keyDownSet.add(event.key.toLowerCase())
-    });
-    document.addEventListener("keyup", (event) => {
-        keySet.delete(event.key.toLowerCase());
-        keyUpSet.add(event.key.toLowerCase());
-    });
     return {
-        state: {
-            keySet: keySet,
-            keyDownSet: keyDownSet,
-            keyUpSet: keyUpSet,
-        },
+        state: KeyBoardData,
         source: RIGHT_KEYBOARD_ID,
         pressJump: function() {
-            return keyDownSet.has("arrowup");
+            return KeyBoardData.keyDownSet.has("arrowup");
         },
         getHorizontal: function() {
             let val = 0;
-            if (keySet.has("arrowright")) {
+            if (KeyBoardData.keySet.has("arrowright")) {
                 val++;
             }
-            if (keySet.has("arrowleft")) {
+            if (KeyBoardData.keySet.has("arrowleft")) {
                 val--;
             }
             return val;
         },
         getVertical: function() {
             let val = 0;
-            if (keySet.has("arrowup")) {
+            if (KeyBoardData.keySet.has("arrowup")) {
                 val++;
             }
-            if (keySet.has("arrowdown")) {
+            if (KeyBoardData.keySet.has("arrowdown")) {
                 val--;
             }
             return val;
         },
         pressPause: function() {
-            return keyDownSet.has("p");
+            return KeyBoardData.keyDownSet.has("p");
         },
         endFrame: function() {
-            keyUpSet.clear();
-            keyDownSet.clear();
+            KeyBoardData.keyUpSet.clear();
+            KeyBoardData.keyDownSet.clear();
         },
         clicked: function() {
-            return keyDownSet.has("m");
+            return KeyBoardData.keyDownSet.has("m");
         }
     }
 }
 
 document.addEventListener("keydown", (event) => {
     if (LEFT_PLAYER_BUTTONS.has(event.key.toLowerCase()) && !GameInput.hasInputSource(LEFT_KEYBOARD_ID)) {
-        GameInput.addNewInputScheme(getKeyBoardLeftPlayer(event.key.toLowerCase()));
+        GameInput.addNewInputScheme(getKeyBoardLeftPlayer());
     }
     if (RIGHT_PLAYER_BUTTONS.has(event.key.toLowerCase()) && !GameInput.hasInputSource(RIGHT_KEYBOARD_ID)) {
-        GameInput.addNewInputScheme(getKeyBoardRightPlayer(event.key.toLowerCase()));
+        GameInput.addNewInputScheme(getKeyBoardRightPlayer());
     }
 });
