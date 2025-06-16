@@ -14,9 +14,10 @@
     <p>Grid Size: </p><input type="number" value="1" min = "0.01" max="10" id = "gridSize"> </input>
     <p>Mode: </p>
     <select name="editMode" id="editMode" onchange="changeMode();">
-        <option value="adding" selected>add</option>
+        <option value="adding" selected>add block</option>
         <option value="deleting">delete</option>
         <option value="spawnPoint" > spawn point </option>
+        <option value="addHeart" > add heart </option>
     </select>
     <h2>Background</h2>
     <input type="color" value="#d040ff" onchange="updateBackground();" id ="backgroundColor"> </input>
@@ -45,6 +46,12 @@
     "viewSize": 30,
     "viewCenter": {"x": 0, "y": 0},
     "color": "purple"
+},
+"collectMode": {
+    "hearts": [
+    {
+        "position": {"x": -15, "y": 6}
+    }]
 },
 "blocks": [{
     "position": {"x": 0, "y": -1},

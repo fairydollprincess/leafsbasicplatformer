@@ -29,6 +29,7 @@ const EDIITING_BLOCK_STATE = "editing";
 const DELETE_MODE = "deleting";
 const MAKE_SPAWN_POINT = "spawnPoint";
 const CAMERA_MOVE = "cameraMove";
+const ADD_HEART = "addHeart";
 
 
 var editorState = {
@@ -73,11 +74,11 @@ function eventToWorldPosition(event) {
     return {x: roundToGridPrecision(fullWorldPosition.x), y: roundToGridPrecision(fullWorldPosition.y)};
 }
 
-function getIndexOfBlockAtPosition(event) {
+function getIndexOfBlockAtPosition(event, blocks) {
     let index = -1;
     let cursor = {position: eventToFullPrecisionWorldPosition(event), size: {x: 0, y: 0}};
-    for (let i = 0; i < worldData.map.blocks.length; i++) {
-        block = worldData.map.blocks[i];
+    for (let i = 0; i < blocks.length; i++) {
+        let block = blocks[i];
         if (BlockFun.intersects(block, cursor)) {
             index = i;
         }
@@ -85,17 +86,15 @@ function getIndexOfBlockAtPosition(event) {
     return index;
 }
 
-function deleteBlockAtPosition(event) {
-    let index = getIndexOfBlockAtPosition(event);
+function deleteBlockAtPosition(event, blocks) {
+    let index = getIndexOfBlockAtPosition(event, blocks);
     if (index === -1) {
-        return;
+        return null;
     }
-    let deleted = worldData.map.blocks[index];
-    worldData.map.blocks.splice(index, 1);
+    let deleted = blocks[index];
+    blocks.splice(index, 1);
     return deleted;
 }
-
-
 document.getElementById("screen").addEventListener("mousedown", (event) => {
     let clickPosition = eventToWorldPosition(event);
     if (editorState.mode === CAMERA_MOVE && editorState.lastState.length > 0) {
@@ -120,9 +119,16 @@ document.getElementById("screen").addEventListener("mousedown", (event) => {
         }
         worldData.map.blocks.push(editorState.block);
     } else if (editorState.mode === DELETE_MODE) {
-        deleteBlockAtPosition(event);
+        deleteBlockAtPosition(event, worldData.map.blocks);
+        if (deleteBlockAtPosition(event, worldData.map.collectMode.hearts) !== null) {
+            resetPlayer();
+        }
     } else if (editorState.mode === MAKE_SPAWN_POINT){
         worldData.map.spawnData.spawnPoint = clickPosition;
+    }
+    else if (editorState.mode === ADD_HEART){
+        worldData.map.collectMode.hearts.push({position: clickPosition, size: {x: 0.5, y: 0.5}});
+        resetPlayer();
     }
 });
 
@@ -168,6 +174,5 @@ readMapFromHTMLTextField();
 drawLevel();
 
 function resetPlayer() {
-    worldData.player.position = {x: worldData.map.worldData.spawnPoint.x, y: worldData.map.worldData.spawnPoint.y};
-    worldData.player.velocity = {x: 0, y: 0};
+    worldData = startGame(worldData.map, getPlayer());
 }
