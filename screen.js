@@ -5,6 +5,12 @@ class Camera{
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
     }
+    // finds an image and loads it into the javascript
+    static readImage(url){
+        const image = new Image(); // creating space for the image
+        image.src = url;
+        return image;
+    }
 
     static makeCam(canvasHTMLId="screen", position = vec2.zero(), viewSize = 2) {
         return new Camera(document.getElementById(canvasHTMLId), position, viewSize);
@@ -124,6 +130,12 @@ class Camera{
         const screenSize = vec2.scalarMul(block.size, this.worldToScreenScale());
         this.context.fillStyle = color;
         this.context.fillRect(screenPos.x - screenSize.x/2, screenPos.y - screenSize.y/2, screenSize.x, screenSize.y);
+    }
+
+    drawImage(block, image) {
+        const screenPos = this.worldPosToScreenPos(block.position);
+        const screenSize = vec2.scalarMul(block.size, this.worldToScreenScale());
+        this.context.drawImage(image, screenPos.x - screenSize.x/2, screenPos.y - screenSize.y/2, screenSize.x, screenSize.y);
     }
     drawBlockBorder(block, color, borderWidth=0.5) {
         const screenPos = this.worldPosToScreenPos(block.position);

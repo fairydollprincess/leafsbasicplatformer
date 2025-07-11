@@ -3,6 +3,9 @@ function getPlayer(controller = GameInput.players[0]) {
         position: vec2.zero(),
         size: vec2.new(0.5, 1),
         velocity: vec2.zero(),
+       graphics: {
+           image: Camera.readImage("./images/characters/orangefairy.png")
+       },
         status: {
             curJumps: 0,
         },
@@ -142,7 +145,7 @@ function resetIfOutofBounds(player, worldData){
 }
 
 function drawPlayer(player, camera){
-    camera.drawBlock(player, "pink");
+    camera.drawImage(player, player.graphics.image);
 }
 
 // make player not fall through the blocks by checking if they're intersecting a block
