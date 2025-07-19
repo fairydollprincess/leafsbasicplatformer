@@ -24,16 +24,16 @@ function returnStateFromPauseState() {
 
 function changeFromLevelSelectToInGameState(map, player) {
     if (player != null) {
-        menuState.currentGameInPlay = startGame(map, getPlayer(player));
+        menuState.currentGameInPlay = startGame(map, new Player(player));
     } else {
-        menuState.currentGameInPlay = startGame(map, getPlayer());
+        menuState.currentGameInPlay = startGame(map, new Player());
     }
     menuState.state = MENU_STATE_IN_GAME;
 }
 
 const menuState = {
     state: MENU_STATE_LEVEL_SELECT,
-    currentGameInPlay: startGame(getDefaultMapData(), getPlayer()),
+    currentGameInPlay: startGame(getDefaultMapData(), new Player()),
     levelSelectMenu: getLevelSelectMenu(MenuManager, changeFromLevelSelectToInGameState),
     pauseMenu: BuildPauseMenu(MenuManager, changeStateToLevelSelectState, returnStateFromPauseState)
 }

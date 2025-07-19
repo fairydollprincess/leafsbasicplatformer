@@ -17,7 +17,7 @@ function startGame(map, player) {
         map: map,
         camera: Camera.makeCam("screen", map.graphics.viewCenter, map.graphics.viewSize)
     };
-    reSpawnPlayer(player, worldData);
+    player.respawn(worldData);
     return worldData;
 }
 
@@ -25,7 +25,7 @@ function countHearts(worldData){
     // check if touching a heart
     let kept = [];
     for(let heart of worldData.gameMode.hearts){
-        if(BlockFun.intersects(heart, worldData.player)){
+        if(BlockFun.intersects(heart, worldData.player.body.block)){
             //Delete the heart and increment heart counter.
             worldData.gameMode.heartCounter++;
         } else {
@@ -70,7 +70,7 @@ function updateTime(worldTime) {
 
 function gameLogicUpdate(worldData) {
     updateTime(worldData.time);
-    updatePlayer(worldData.player, worldData);
+    worldData.player.update(worldData);
     countHearts(worldData);
 
 }
@@ -78,7 +78,7 @@ function gameLogicUpdate(worldData) {
 function gameRender(worldData) {
     worldData.camera.drawBackground(worldData.map.graphics.color);
     MapFun.draw(worldData.map, worldData.camera);
-    drawPlayer(worldData.player, worldData.camera);
+    worldData.player.draw(worldData.camera);
     drawHearts(worldData);
 }
 

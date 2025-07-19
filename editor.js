@@ -1,4 +1,4 @@
-var worldData = startGame(getDefaultMapData(), getPlayer());
+var worldData = startGame(getDefaultMapData(), new Player());
 
 function changeMap(mapText) {
     worldData.map = MapFun.read(mapText);
@@ -174,5 +174,5 @@ readMapFromHTMLTextField();
 drawLevel();
 
 function resetPlayer() {
-    worldData = startGame(worldData.map, getPlayer());
+    worldData = startGame(worldData.map, new Player());
 }
