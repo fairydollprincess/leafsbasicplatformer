@@ -20,13 +20,16 @@ class Player {
             velocity: vec2.zero(),
         };
         this.graphics = {
-            image: Camera.readImage("./images/characters/orangefairy.png")
+            left: Camera.readImage("./images/characters/orangefairy/left.png"),
+            right: Camera.readImage("./images/characters/orangefairy/right.png")
         };
         this.status = {
             curJumps: 0,
+            directionFaced: -1 // fairy starts facing left
         };
         this.stats = stats;
         this.input = controller;
+
     }
 
 
@@ -151,7 +154,19 @@ class Player {
     }
 
     draw(camera) {
-        camera.drawImage(this.body.block, this.graphics.image);
+        if(this.input.getHorizontal() < 0){
+            this.status.directionFaced = -1;
+        }
+        else if(this.input.getHorizontal() > 0){
+            this.status.directionFaced = 1;
+        }
+
+        if(this.status.directionFaced < 0){
+            camera.drawImage(this.body.block, this.graphics.left);
+        }
+        else {
+            camera.drawImage(this.body.block, this.graphics.right);
+        }
     }
 
     static interactWithBlock(prevPos, endPos, allBlocks) {
