@@ -82,7 +82,29 @@ function gameRender(worldData) {
     drawHearts(worldData);
 }
 
+function moveCamera(worldData){
+    let playerPos = worldData.player.body.block.position;
+    let cameraPos = worldData.camera.position;
+    let relativePos = vec2.sub(playerPos, cameraPos);
+    let range = worldData.camera.viewSize/6;
+    if (relativePos.x > range){
+        worldData.camera.position.x = playerPos.x - range;
+    }
+    if(relativePos.y > range){
+        worldData.camera.position.y = playerPos.y - range;
+    }
+    if(relativePos.x < -range){
+        worldData.camera.position.x = playerPos.x + range;
+
+    }
+    if(relativePos.y < -range){
+        worldData.camera.position.y = playerPos.y + range;
+
+    }
+}
+
 function gameFullUpdate(worldData) {
     gameLogicUpdate(worldData);
     gameRender(worldData);
+    moveCamera(worldData);
 }
